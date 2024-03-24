@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="32c97c09-6cb3-43fc-9e7f-b8d0fe87f2a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/model/Venda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Venda.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/dao/DataBaseConection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +22,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/.jdks/openjdk-22/lib/src.zip!/java.base/java/lang/String.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -61,7 +65,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711287848461</updated>
-      <workItem from="1711287849559" duration="4387000" />
+      <workItem from="1711287849559" duration="4984000" />
     </task>
     <servers />
   </component>
