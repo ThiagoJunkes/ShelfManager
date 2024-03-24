@@ -45,5 +45,6 @@ public class Venda {
     public int getCodCliente() {
         return codCliente;
     }
+}
 
 
