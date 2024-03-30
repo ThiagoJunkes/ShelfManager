@@ -1,6 +1,12 @@
 package model;
 
+import dao.DataBaseConection;
+
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Cliente {
     private int codCliente;
@@ -75,6 +81,37 @@ public class Cliente {
 
     public void setCodEndereco(int codEndereco) {
         this.codEndereco = codEndereco;
+    }
+
+    public static List<Cliente> buscarClientes(DataBaseConection banco){
+        List<Cliente> clientes = new ArrayList<>();
+        ResultSet resultSet = null;
+
+        try{
+            String sql = "SELECT * FROM clientes";
+            resultSet = banco.statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Cliente cliente = new Cliente();
+
+                cliente.codCliente = resultSet.getInt("cod_cliente");
+                cliente.nome = resultSet.getString("nome");
+                cliente.sobrenome = resultSet.getString("sobrenome");
+                cliente.cpf = resultSet.getLong("cpf");
+                cliente.emailCliente = resultSet.getString("email_cliente");
+                cliente.telefoneCliente = resultSet.getString("telefone_cliente");
+                cliente.dataCadastro = resultSet.getDate("data_cadastro");
+                cliente.codEndereco = resultSet.getInt("cod_endereco");
+
+                clientes.add(cliente);
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        return  clientes;
     }
 }
 
