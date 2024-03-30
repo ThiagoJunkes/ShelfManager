@@ -2,18 +2,22 @@
 ### Trabalho para a disciplina de Banco de Dados 2 do curso de Análise e Desenvolvimento de Sistemas da UDESC.
 #### Desenvolvido em Java 22 com o framework X, utilizando PostgreSQL
 
+# Recursos utilizados para o desenvolvimento do projeto
+- PostgreSQL (versão 16.2);
+- pgAdmin4;
+- IDE IntelliJ IDEA Community.
+
 # Criando o Banco de Dados no PostgreSQL
 
 Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
 
 1. Abra o pgAdmin e conecte-se ao seu servidor PostgreSQL.
+   - Para isso, nomeie seu Servidor e seu Host (nesse caso, usaremos localhost).
 2. Clique com o botão direito em "Databases" e escolha "Create" -> "Database...".
    - Nomeie o banco de dados como "ShelfManager".
    - Clique em "Save" ou "OK" para criar o banco de dados.
-
 3. Agora que o banco de dados está criado, abra o Query Tool:
    - Clique com o botão direito no banco de dados "ShelfManager" e escolha "Query Tool...".
-
 4. Na janela do Query Tool, cole o seguinte script SQL e execute para criar as tabelas:
 
    ```sql
