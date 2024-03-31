@@ -5,8 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="32c97c09-6cb3-43fc-9e7f-b8d0fe87f2a9" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/model/Estoque.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/model/ItemVenda.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Cliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Cliente.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Editora.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Editora.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Endereco.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Endereco.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Livro.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Livro.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Venda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Venda.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +73,7 @@
       <option name="presentableId" value="Default" />
       <updated>1711287848461</updated>
       <workItem from="1711287849559" duration="5628000" />
-      <workItem from="1711836184010" duration="2135000" />
+      <workItem from="1711836184010" duration="6318000" />
     </task>
     <servers />
   </component>

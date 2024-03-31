@@ -1,5 +1,12 @@
 package model;
 
+import dao.DataBaseConection;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Endereco {
     private int codEndereco;
     private String rua;
@@ -55,6 +62,34 @@ public class Endereco {
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
+    }
+
+    public static List<Endereco> buscarEnderecos(DataBaseConection banco){
+        List<Endereco> enderecos = new ArrayList<>();
+        ResultSet resultSet = null;
+
+        try{
+            String sql = "SELECT * FROM enderecos";
+            resultSet = banco.statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Endereco endereco = new Endereco();
+
+                endereco.codEndereco = resultSet.getInt("cod_endereco");
+                endereco.rua = resultSet.getString("rua");
+                endereco.cidade = resultSet.getString("cidade");
+                endereco.estado = resultSet.getString("estado");
+                endereco.cep = resultSet.getInt("cep");
+                endereco.complemento = resultSet.getString("complemento");
+
+                enderecos.add(endereco);
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return  enderecos;
     }
 }
 

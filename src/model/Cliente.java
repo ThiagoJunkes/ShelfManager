@@ -110,7 +110,6 @@ public class Cliente {
             e.printStackTrace();
         }
 
-
         return  clientes;
     }
 }

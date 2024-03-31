@@ -1,6 +1,12 @@
 package model;
 
+import dao.DataBaseConection;
+
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Livro {
     private int codLivro;
@@ -75,6 +81,36 @@ public class Livro {
 
     public void setCodEditora(int codEditora) {
         this.codEditora = codEditora;
+    }
+
+    public static List<Livro> buscarLivros(DataBaseConection banco){
+        List<Livro> livros = new ArrayList<>();
+        ResultSet resultSet = null;
+
+        try{
+            String sql = "SELECT * FROM livros";
+            resultSet = banco.statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Livro livro = new Livro();
+
+                livro.codLivro = resultSet.getInt("cod_livro");
+                livro.titulo = resultSet.getString("titulo");
+                livro.genero = resultSet.getString("genero");
+                livro.autor = resultSet.getString("autor");
+                livro.isbn = resultSet.getLong("isbn");
+                livro.anoPublicacao = resultSet.getDate("ano_publicacao");
+                livro.preco = resultSet.getDouble("preco");
+                livro.codEditora = resultSet.getInt("cod_Editora");
+
+                livros.add(livro);
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return  livros;
     }
 }
 

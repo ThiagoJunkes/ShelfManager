@@ -1,6 +1,12 @@
 package model;
 
+import dao.DataBaseConection;
+
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Venda {
     private int codVenda;
@@ -44,6 +50,33 @@ public class Venda {
 
     public int getCodCliente() {
         return codCliente;
+    }
+
+    public static List<Venda> buscarVendas(DataBaseConection banco){
+        List<Venda> vendas = new ArrayList<>();
+        ResultSet resultSet = null;
+
+        try{
+            String sql = "SELECT * FROM vendas";
+            resultSet = banco.statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                Venda venda = new Venda();
+
+                venda.codVenda = resultSet.getInt("cod_venda");
+                venda.valorVenda = resultSet.getDouble("valor_venda");
+                venda.dataVenda = resultSet.getDate("data_venda");
+                venda.metodoPag = resultSet.getString("metodo_pag");
+                venda.codCliente = resultSet.getInt("cod_cliente");
+
+                vendas.add(venda);
+            }
+
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return  vendas;
     }
 }
 
