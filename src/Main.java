@@ -2,7 +2,6 @@ import dao.DataBaseConection;
 import model.*;
 import view.Menu;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.sql.Date;
 import java.util.List;
@@ -382,7 +381,6 @@ public class Main {
                                 String novoNome = scanner.nextLine();
                                 if (!novoNome.isEmpty()) {
                                     editoraEditar.setNomeEditora(novoNome);
-                                    System.out.println("Nome da Editora atualizado com sucesso!");
                                 } else {
                                     System.out.println("Nome da Editora não pode ser vazio. Operação cancelada.");
                                     editar = false;
@@ -393,7 +391,6 @@ public class Main {
                                 String novoContato = scanner.nextLine();
                                 if (!novoContato.isEmpty()) {
                                     editoraEditar.setNomeContato(novoContato);
-                                    System.out.println("Nome do Contato atualizado com sucesso!");
                                 } else {
                                     System.out.println("Nome do Contato não pode ser vazio. Operação cancelada.");
                                     editar = false;
@@ -404,7 +401,6 @@ public class Main {
                                 String novoEmail = scanner.nextLine();
                                 if (!novoEmail.isEmpty() && novoEmail.contains("@") && novoEmail.length() < 100) {
                                     editoraEditar.setEmailEditora(novoEmail);
-                                    System.out.println("Email da Editora atualizado com sucesso!");
                                 } else {
                                     System.out.println("Email da Editora inválido. Deve conter @ e ter menos de 100 caracteres.");
                                     editar = false;
@@ -415,7 +411,6 @@ public class Main {
                                 String novoTelefone = scanner.nextLine();
                                 if (!novoTelefone.isEmpty() && novoTelefone.matches("\\(\\d{2}\\)\\s\\d{4,5}-\\d{4}")) {
                                     editoraEditar.setTelefoneEditora(novoTelefone);
-                                    System.out.println("Telefone da Editora atualizado com sucesso!");
                                 } else {
                                     System.out.println("Formato de telefone inválido. Deve ser no formato '(XX) XXXX-XXXX'.");
                                     editar = false;
@@ -541,8 +536,19 @@ public class Main {
                         System.out.println("Código da Editora inválido!");
                         break;
                     }
-
                     novoLivro.setCodEditora(escolhaEditora);
+
+                    System.out.print("Quantidade em estoque: ");
+                    int qtd = -1;
+                    do{
+                        qtd = Integer.parseInt(scanner.nextLine());
+                        if(qtd < 0){
+                            System.out.println("Escolha uma quantidade maior que 0!");
+                            System.out.print("Quantidade em estoque: ");
+                        }
+                    }while(qtd < 0);
+
+                    novoLivro.setQtdEstoque(qtd);
 
                     if (Livro.adicionarLivro(novoLivro, banco)) {
                         System.out.println("Novo livro adicionado com sucesso!");
@@ -573,12 +579,13 @@ public class Main {
                             int escolha = Integer.parseInt(scanner.nextLine());
                             boolean editar = true;
                             switch (escolha) {
+                                case 0:
+                                    break;
                                 case 1:
                                     System.out.print("Novo Título: ");
                                     String novoTitulo = scanner.nextLine();
                                     if (!novoTitulo.isEmpty()) {
                                         livroEditar.setTitulo(novoTitulo);
-                                        System.out.println("Título atualizado com sucesso!");
                                     } else {
                                         System.out.println("Título não pode ser vazio. Operação cancelada.");
                                         editar = false;
@@ -589,7 +596,6 @@ public class Main {
                                     String novoGenero = scanner.nextLine();
                                     if (!novoGenero.isEmpty()) {
                                         livroEditar.setGenero(novoGenero);
-                                        System.out.println("Gênero atualizado com sucesso!");
                                     } else {
                                         System.out.println("Gênero não pode ser vazio. Operação cancelada.");
                                         editar = false;
@@ -600,7 +606,6 @@ public class Main {
                                     String novoAutor = scanner.nextLine();
                                     if (!novoAutor.isEmpty()) {
                                         livroEditar.setAutor(novoAutor);
-                                        System.out.println("Autor atualizado com sucesso!");
                                     } else {
                                         System.out.println("Autor não pode ser vazio. Operação cancelada.");
                                         editar = false;
@@ -610,27 +615,62 @@ public class Main {
                                     System.out.print("Novo ISBN: ");
                                     long novoISBN = Long.parseLong(scanner.nextLine());
                                     livroEditar.setIsbn(novoISBN);
-                                    System.out.println("ISBN atualizado com sucesso!");
                                     break;
                                 case 5:
-                                    System.out.print("Nova Data de Publicação (AAAA-MM-DD): ");
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                    java.util.Date parsedDate = sdf.parse(scanner.nextLine());
-                                    java.sql.Date sqlDate = new java.sql.Date(parsedDate.getTime());
+                                    String data = "";
+                                    do{
+                                        System.out.print("Novo Ano de Publicação (DD/MM/AAAA): ");
+                                        data = scanner.next();
+                                        if (!data.matches("^\\d{2}/\\d{2}/\\d{4}$")) {
+                                            System.out.println("Formato de data inválido! Use DD/MM/AAAA.");
+                                        }
+                                    }while(!data.matches("^\\d{2}/\\d{2}/\\d{4}$"));
+
+                                    SimpleDateFormat sdfInput = new SimpleDateFormat("dd/MM/yyyy");
+                                    java.util.Date parsedDate = sdfInput.parse(data);
+                                    Date sqlDate = new Date(parsedDate.getTime());
+
                                     livroEditar.setAnoPublicacao(sqlDate);
-                                    System.out.println("Data de Publicação atualizada com sucesso!");
                                     break;
                                 case 6:
-                                    System.out.print("Novo Preço: ");
-                                    double novoPreco = Double.parseDouble(scanner.nextLine());
-                                    livroEditar.setPreco(novoPreco);
-                                    System.out.println("Preço atualizado com sucesso!");
+                                    System.out.print("Novo Preço (9.99): ");
+                                    String preco = "";
+                                    do{
+                                        System.out.print("Novo Preço (9.99): ");
+                                        preco = scanner.nextLine();
+                                        if(!preco.matches("\\b\\d+\\.\\d{2}\\b")){
+                                            System.out.println("Preço inválido, não use virgula e não esqueça de colocar os centavos");
+                                        }
+                                    }while (!preco.matches("\\b\\d+\\.\\d{2}\\b"));
+
+                                    livroEditar.setPreco(Double.parseDouble(preco));
                                     break;
                                 case 7:
-                                    System.out.print("Novo Código da Editora: ");
-                                    int novoCodEditora = Integer.parseInt(scanner.nextLine());
-                                    livroEditar.setCodEditora(novoCodEditora);
-                                    System.out.println("Código da Editora atualizado com sucesso!");
+                                    System.out.println("Editoras Disponíveis: ");
+                                    List<Editora> editoras = Editora.buscarEditoras(banco);
+                                    System.out.println("0 | Voltar ao Menu Inicial");
+                                    for (Editora editora: editoras) {
+                                        System.out.println(editora.getCodEditora() + " | " + editora.getNomeEditora());
+                                    }
+                                    System.out.print("Escolha uma editora: ");
+                                    int escolhaEditora = Integer.parseInt(scanner.nextLine());
+
+                                    if(escolhaEditora == 0) break; // Volta ao Menu Inicial
+
+                                    boolean hasEditora = false;
+                                    for (Editora editora : editoras) {
+                                        if (editora.getCodEditora() == escolhaEditora) {
+                                            hasEditora = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if(!hasEditora){
+                                        System.out.println("Código da Editora inválido!");
+                                        break;
+                                    }
+
+                                    livroEditar.setCodEditora(escolhaEditora);
                                     break;
                                 default:
                                     System.out.println("Opção inválida. Voltando ao menu anterior...");
@@ -664,6 +704,7 @@ public class Main {
 
                     if (livroExcluir != null) {
                         livroExcluir.printLivroSemFormatacao();
+                        System.out.println("O livro será excluido do estoque também!");
                         System.out.print("Tem certeza que deseja excluir o Livro acima? (s/n) ");
                         String resposta = scanner.nextLine();
                         if (resposta.toUpperCase().equals("SIM") || resposta.toUpperCase().equals("S")) {

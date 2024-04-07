@@ -89,8 +89,8 @@ public class Menu {
     public static void livros(List<Livro> livros) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        System.out.println("|Cod Livro | Título                  | Gênero               | Autor           | ISBN            | Ano Publicação  | Preço  | Cod Editora | Nome da Editora         |");
-        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|--------|-------------|-------------------------|");
+        System.out.println("|Cod Livro | Título                  | Gênero               | Autor           | ISBN            | Ano Publicação  | Preço    | Cod Editora | Nome da Editora         |");
+        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|----------|-------------|-------------------------|");
 
         for (Livro livro : livros) {
             // Limitando o tamanho dos campos
@@ -103,7 +103,7 @@ public class Menu {
             String codEditora = String.valueOf(livro.getCodEditora());
             String nomeEditora = livro.editora.getNomeEditora().length() > 25 ? livro.editora.getNomeEditora().substring(0, 25) : livro.editora.getNomeEditora();
 
-            System.out.printf("| %-8d | %-23s | %-20s | %-15s | %-15s | %-15s | %-6s | %-11s | %-23s |\n",
+            System.out.printf("| %-8d | %-23s | %-20s | %-15s | %-15s | %-15s | %-8s | %-11s | %-23s |\n",
                     livro.getCodLivro(),
                     titulo,
                     genero,
@@ -114,8 +114,9 @@ public class Menu {
                     codEditora,
                     nomeEditora);
         }
-        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|--------|-------------|-------------------------|");
+        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|----------|-------------|-------------------------|");
     }
+
 
 
 
