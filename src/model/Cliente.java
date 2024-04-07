@@ -83,6 +83,67 @@ public class Cliente {
         this.codEndereco = codEndereco;
     }
 
+    public static boolean editarClienteTeste(Cliente cliente, DataBaseConection banco) {
+        boolean sucesso = false;
+        ResultSet resultSet = null;
+
+        try {
+            String sql = "UPDATE clientes SET nome = '" + cliente.getNome() + "', sobrenome = '" + cliente.getSobrenome() +
+                    "', cpf = " + cliente.getCpf() + ", email_cliente = '" + cliente.getEmailCliente() +
+                    "', telefone_cliente = '" + cliente.getTelefoneCliente() + "', cod_endereco = " + cliente.getCodEndereco() +
+                    " WHERE cod_cliente = " + cliente.getCodCliente();
+            resultSet = banco.statement.executeQuery(sql);
+
+            String result = resultSet.getString(1);
+            System.out.println("Resultado: " + result);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public static boolean editarCliente(Cliente cliente, DataBaseConection banco) {
+        boolean sucesso = false;
+
+        try {
+            String sql = "UPDATE clientes " +
+                    "SET nome = ?, sobrenome = ?, cpf = ?, email_cliente = ?, telefone_cliente = ?, cod_endereco = ? " +
+                    "WHERE cod_cliente = ?";
+            banco.preparedStatement = banco.connection.prepareStatement(sql);
+
+            banco.preparedStatement.setString(1, cliente.getNome());
+            banco.preparedStatement.setString(2, cliente.getSobrenome());
+            banco.preparedStatement.setLong(3, cliente.getCpf());
+            banco.preparedStatement.setString(4, cliente.getEmailCliente());
+            banco.preparedStatement.setString(5, cliente.getTelefoneCliente());
+            banco.preparedStatement.setInt(6, cliente.getCodEndereco());
+            banco.preparedStatement.setInt(7, cliente.getCodCliente());
+
+            int linhasAfetadas = banco.preparedStatement.executeUpdate();
+            if (linhasAfetadas > 0) {
+                sucesso = true;
+                System.out.println("Cliente atualizado com sucesso!");
+            } else {
+                System.out.println("Nenhum cliente atualizado.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (banco.preparedStatement != null) {
+                    banco.preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return sucesso;
+    }
+
+
     public static List<Cliente> buscarClientes(DataBaseConection banco){
         List<Cliente> clientes = new ArrayList<>();
         ResultSet resultSet = null;

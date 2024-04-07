@@ -1,10 +1,6 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class DataBaseConection {
     private String host = "localhost"; // endereço IP do seu servidor PostgreSQL
@@ -17,6 +13,7 @@ public class DataBaseConection {
 
     public Connection connection = null;
     public Statement statement = null;
+    public PreparedStatement preparedStatement;
     public DataBaseConection(){
         try{
 

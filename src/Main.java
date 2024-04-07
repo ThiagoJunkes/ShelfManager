@@ -1,60 +1,61 @@
 import dao.DataBaseConection;
 import model.*;
+import view.Menu;
 
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Teste");
+        Scanner scanner = new Scanner(System.in);
         DataBaseConection banco = new DataBaseConection();
 
-        List<Cliente> clientes = Cliente.buscarClientes(banco);
+        String escolha;
+        do{
+            Menu.inicial();
+            System.out.println("Escolha uma opcao: ");
+            escolha = scanner.nextLine();
 
-        System.out.println("CLientes:");
-        for (Cliente cliente: clientes) {
-            System.out.println(cliente.getCodCliente() + " | " + cliente.getNome() + " | " + cliente.getDataCadastro());
-        }
+            switch (escolha){
+                case "1":
+                    System.out.println("Opção Clientes selecionada.");
+                    List<Cliente> clientes = Cliente.buscarClientes(banco);
+                    Menu.clientes(clientes);
+                    System.out.println("Ações:");
+                    System.out.println("0 - Menu Inicial | 1 - Editar Cliente");
+                    break;
+                case "2":
+                    System.out.println("Opção Editoras selecionada.");
+                    Menu.editoras();
+                    break;
+                case "3":
+                    System.out.println("Opção Livros selecionada.");
+                    Menu.livros();
+                    break;
+                case "4":
+                    System.out.println("Opção Vendas selecionada.");
+                    Menu.vendas();
+                    break;
+                case "5":
+                    System.out.println("Opção Estoque selecionada.");
+                    Menu.estoque();
+                    break;
+                case "6":
+                    System.out.println("Opção Relatórios selecionada.");
+                    Menu.relatorios();
+                    break;
+                case "0":
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+            }
 
-        List<Editora> editoras = Editora.buscarEditoras(banco);
+            if (!escolha.equals("0")) {
+                System.out.println("Pressione Enter para continuar...");
+                scanner.nextLine();
+            }
 
-        System.out.println("Editoras:");
-        for (Editora editora: editoras) {
-            System.out.println(editora.getCodEditora() + " | " + editora.getNomeEditora());
-        }
-
-        List<Endereco> enderecos = Endereco.buscarEnderecos(banco);
-
-        System.out.println("Enderecos:");
-        for (Endereco endereco: enderecos) {
-            System.out.println(endereco.getCodEndereco() + " | " + endereco.getCep());
-        }
-
-        List<Livro> livros = Livro.buscarLivros(banco);
-
-        System.out.println("Enderecos:");
-        for (Livro livro: livros) {
-            System.out.println(livro.getCodLivro() + " | " + livro.getTitulo());
-        }
-
-        List<Venda> vendas = Venda.buscarVendas(banco);
-
-        System.out.println("Vendas:");
-        for (Venda venda: vendas) {
-            System.out.println(venda.getCodVenda() + " | " + venda.getValorVenda());
-        }
-
-        List<Estoque> estoque = Estoque.buscarEstoque(banco);
-
-        System.out.println("Estoque:");
-        for (Estoque est: estoque) {
-            System.out.println(est.getCodLivro() + " | " + est.getQtdEstoque());
-        }
-
-        List<ItemVenda> itensVendas = ItemVenda.buscarItensVenda(banco);
-
-        System.out.println("itens das Vendas:");
-        for (ItemVenda itemVenda: itensVendas) {
-            System.out.println(itemVenda.getCodPedido() + " | " + itemVenda.getCodLivro() + " | " + itemVenda.getQtdLivros());
-        }
+        }while(!escolha.equals("0"));
     }
 }
