@@ -19,12 +19,13 @@ public class DataBaseConection {
 
         // Estabelecer conexão
         connection = DriverManager.getConnection(connectionString);
-        System.out.println("Conexão estabelecida com sucesso!");
+        System.out.println("Conexão com o Banco de Dados estabelecida com sucesso!");
 
         // Criar uma declaração
         statement = connection.createStatement();
         }catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("O sistema não irá funcionar corretamente! Verifique sua conexão com o Banco de Dados.");
         }
     }
 

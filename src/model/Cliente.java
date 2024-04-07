@@ -139,7 +139,7 @@ public class Cliente {
         ResultSet resultSet = null;
 
         try{
-            String sql = "SELECT * FROM clientes";
+            String sql = "SELECT * FROM clientes ORDER BY cod_cliente";
             resultSet = banco.statement.executeQuery(sql);
 
             while (resultSet.next()) {
