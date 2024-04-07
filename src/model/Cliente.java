@@ -83,26 +83,16 @@ public class Cliente {
         this.codEndereco = codEndereco;
     }
 
-    public static boolean editarClienteTeste(Cliente cliente, DataBaseConection banco) {
-        boolean sucesso = false;
-        ResultSet resultSet = null;
-
-        try {
-            String sql = "UPDATE clientes SET nome = '" + cliente.getNome() + "', sobrenome = '" + cliente.getSobrenome() +
-                    "', cpf = " + cliente.getCpf() + ", email_cliente = '" + cliente.getEmailCliente() +
-                    "', telefone_cliente = '" + cliente.getTelefoneCliente() + "', cod_endereco = " + cliente.getCodEndereco() +
-                    " WHERE cod_cliente = " + cliente.getCodCliente();
-            resultSet = banco.statement.executeQuery(sql);
-
-            String result = resultSet.getString(1);
-            System.out.println("Resultado: " + result);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
+    public void printClienteSemFormatacao() {
+        System.out.println("Cliente: " + codCliente + " | Data Cadastro: " + dataCadastro);
+        System.out.println("1 - Nome:          " + nome);
+        System.out.println("2 - Sobrenome:     " + sobrenome);
+        System.out.println("3 - CPF:           " + cpf);
+        System.out.println("4 - Email:         " + emailCliente);
+        System.out.println("5 - Telefone:      " + telefoneCliente);
+        System.out.println("6 - Cod Endereco:  " + codEndereco);
     }
+
     public static boolean editarCliente(Cliente cliente, DataBaseConection banco) {
         boolean sucesso = false;
 

@@ -29,7 +29,6 @@ public class Menu {
     public static void clientes(List<Cliente> clientes){
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        System.out.println("Clientes:");
         System.out.println("|Cod Cliente | Nome            | Sobrenome       | CPF            | Email                     | Telefone        |Data Cadastro | Cod Endereco |");
         System.out.println("|------------|-----------------|-----------------|----------------|---------------------------|-----------------|--------------|--------------|");
 
