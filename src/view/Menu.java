@@ -1,6 +1,6 @@
 package view;
 
-import model.Cliente;
+import model.*;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -60,17 +60,64 @@ public class Menu {
         System.out.println("|------------|-----------------|-----------------|----------------|---------------------------|-----------------|--------------|-----------------|-----------------|--------|----------|-------------------|");
     }
 
-    public static void editoras(){
-        System.out.println("Editoras");
+    public static void editoras(List<Editora> editoras){
+        System.out.println("|Cod Editora | Nome da Editora         | Nome do Contato    | Email da Editora               | Telefone da Editora  |");
+        System.out.println("|------------|-------------------------|--------------------|--------------------------------|----------------------|");
+
+        for (Editora editora : editoras) {
+            // Limitando o tamanho dos campos
+            String nomeEditora = editora.getNomeEditora().length() > 25 ? editora.getNomeEditora().substring(0, 25) : editora.getNomeEditora();
+            String nomeContato = editora.getNomeContato().length() > 20 ? editora.getNomeContato().substring(0, 20) : editora.getNomeContato();
+            String email = editora.getEmailEditora().length() > 30 ? editora.getEmailEditora().substring(0, 30) : editora.getEmailEditora();
+            String telefone = editora.getTelefoneEditora().length() > 20 ? editora.getTelefoneEditora().substring(0, 20) : editora.getTelefoneEditora();
+
+            System.out.printf("| %-10d | %-23s | %-18s | %-30s | %-20s |\n",
+                    editora.getCodEditora(),
+                    nomeEditora,
+                    nomeContato,
+                    email,
+                    telefone);
+        }
+        System.out.println("|------------|-------------------------|--------------------|--------------------------------|----------------------|");
     }
+
 
     public static void estoque(){
         System.out.println("Estoque");
     }
 
-    public static void livros(){
-        System.out.println("Livros");
+    public static void livros(List<Livro> livros) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        System.out.println("|Cod Livro | Título                  | Gênero               | Autor           | ISBN            | Ano Publicação  | Preço  | Cod Editora | Nome da Editora         |");
+        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|--------|-------------|-------------------------|");
+
+        for (Livro livro : livros) {
+            // Limitando o tamanho dos campos
+            String titulo = livro.getTitulo().length() > 20 ? livro.getTitulo().substring(0, 20) : livro.getTitulo();
+            String genero = livro.getGenero().length() > 18 ? livro.getGenero().substring(0, 18) : livro.getGenero();
+            String autor = livro.getAutor().length() > 15 ? livro.getAutor().substring(0, 15) : livro.getAutor();
+            String isbn = String.valueOf(livro.getIsbn());
+            String anoPublicacao = dateFormat.format(livro.getAnoPublicacao());
+            String preco = String.valueOf(livro.getPreco());
+            String codEditora = String.valueOf(livro.getCodEditora());
+            String nomeEditora = livro.editora.getNomeEditora().length() > 25 ? livro.editora.getNomeEditora().substring(0, 25) : livro.editora.getNomeEditora();
+
+            System.out.printf("| %-8d | %-23s | %-20s | %-15s | %-15s | %-15s | %-6s | %-11s | %-23s |\n",
+                    livro.getCodLivro(),
+                    titulo,
+                    genero,
+                    autor,
+                    isbn,
+                    anoPublicacao,
+                    preco,
+                    codEditora,
+                    nomeEditora);
+        }
+        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|--------|-------------|-------------------------|");
     }
+
+
 
     public static void vendas(){
         System.out.println("Vendas");
