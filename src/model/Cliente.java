@@ -92,6 +92,15 @@ public class Cliente {
         System.out.println("3 - CPF:           " + cpf);
         System.out.println("4 - Email:         " + emailCliente);
         System.out.println("5 - Telefone:      " + telefoneCliente);
+
+        if (endereco != null) {
+            System.out.println("Endereço:");
+            System.out.println("6 - Rua:           " + endereco.getRua());
+            System.out.println("7 - Cidade:        " + endereco.getCidade());
+            System.out.println("8 - Estado:        " + endereco.getEstado());
+            System.out.println("9 - CEP:           " + endereco.getCep());
+            System.out.println("10- Complemento:   " + endereco.getComplemento());
+        }
     }
 
     public static boolean editarCliente(Cliente cliente, DataBaseConection banco) {
@@ -172,5 +181,102 @@ public class Cliente {
 
         return  clientes;
     }
+
+    public static boolean adicionarCliente(Cliente cliente, DataBaseConection banco) {
+        boolean sucesso = false;
+
+        try {
+            // Insere o endereço primeiro
+            String sqlEndereco = "INSERT INTO enderecos (rua, cidade, estado, cep, complemento) VALUES (?, ?, ?, ?, ?) RETURNING cod_endereco";
+            banco.preparedStatement = banco.connection.prepareStatement(sqlEndereco);
+            banco.preparedStatement.setString(1, cliente.endereco.getRua());
+            banco.preparedStatement.setString(2, cliente.endereco.getCidade());
+            banco.preparedStatement.setString(3, cliente.endereco.getEstado());
+            banco.preparedStatement.setInt(4, cliente.endereco.getCep());
+            banco.preparedStatement.setString(5, cliente.endereco.getComplemento());
+
+            // Executa a inserção e obtém o ID do endereço inserido
+            ResultSet resultSetEndereco = banco.preparedStatement.executeQuery();
+            int codEndereco = -1; // Valor inicial inválido
+            if (resultSetEndereco.next()) {
+                codEndereco = resultSetEndereco.getInt(1); // Pega o primeiro resultado da primeira coluna
+            }
+
+            if (codEndereco != -1) {
+                // Se o endereço foi inserido com sucesso, insere o cliente
+                String sqlCliente = "INSERT INTO clientes (nome, sobrenome, cpf, email_cliente, telefone_cliente, cod_endereco) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)";
+                banco.preparedStatement = banco.connection.prepareStatement(sqlCliente);
+                banco.preparedStatement.setString(1, cliente.getNome());
+                banco.preparedStatement.setString(2, cliente.getSobrenome());
+                banco.preparedStatement.setLong(3, cliente.getCpf());
+                banco.preparedStatement.setString(4, cliente.getEmailCliente());
+                banco.preparedStatement.setString(5, cliente.getTelefoneCliente());
+                banco.preparedStatement.setInt(6, codEndereco);
+
+                int linhasAfetadasCliente = banco.preparedStatement.executeUpdate();
+                if (linhasAfetadasCliente > 0) {
+                    sucesso = true;
+                    System.out.println("Cliente adicionado com sucesso!");
+                } else {
+                    System.out.println("Falha ao adicionar cliente.");
+                }
+            } else {
+                System.out.println("Falha ao obter o ID do endereço.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (banco.preparedStatement != null) {
+                    banco.preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return sucesso;
+    }
+
+    public static void excluirCliente(Cliente cliente, DataBaseConection banco) {
+
+        try {
+            String sqlVerificarCompras = "SELECT cod_venda FROM vendas WHERE cod_cliente = ?";
+            banco.preparedStatement = banco.connection.prepareStatement(sqlVerificarCompras);
+            banco.preparedStatement.setInt(1, cliente.getCodCliente());
+            ResultSet rs = banco.preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                System.out.println("Não é possível excluir o cliente pois ele já realizou uma compra.");
+            } else {
+                String sqlCliente = "DELETE FROM clientes WHERE cod_cliente = ?";
+                banco.preparedStatement = banco.connection.prepareStatement(sqlCliente);
+                banco.preparedStatement.setInt(1, cliente.getCodCliente());
+
+                int linhasAfetadasCliente = banco.preparedStatement.executeUpdate();
+                if (linhasAfetadasCliente > 0) {
+                    System.out.println("Cliente excluído com sucesso!");
+                    Endereco.excluirEndereco(cliente.endereco, banco);
+                } else {
+                    System.out.println("Falha ao excluir cliente.");
+                }
+            }
+
+            rs.close();
+        } catch (SQLException e) {
+            System.out.println("Falha ao excluir cliente.");
+        } finally {
+            try {
+                if (banco.preparedStatement != null) {
+                    banco.preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
 

@@ -91,5 +91,58 @@ public class Endereco {
 
         return  enderecos;
     }
+
+    public static boolean editarEndereco(Endereco endereco, DataBaseConection banco) {
+        boolean sucesso = false;
+
+        try {
+            String sql = "UPDATE enderecos " +
+                    "SET rua = ?, cidade = ?, estado = ?, cep = ?, complemento = ? " +
+                    "WHERE cod_endereco = ?";
+            banco.preparedStatement = banco.connection.prepareStatement(sql);
+
+            banco.preparedStatement.setString(1, endereco.getRua());
+            banco.preparedStatement.setString(2, endereco.getCidade());
+            banco.preparedStatement.setString(3, endereco.getEstado());
+            banco.preparedStatement.setInt(4, endereco.getCep());
+            banco.preparedStatement.setString(5, endereco.getComplemento());
+            banco.preparedStatement.setInt(6, endereco.getCodEndereco());
+
+
+            int linhasAfetadas = banco.preparedStatement.executeUpdate();
+            if (linhasAfetadas > 0) {
+                sucesso = true;
+                System.out.println("Cliente atualizado com sucesso!");
+            } else {
+                System.out.println("Nenhum cliente atualizado.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (banco.preparedStatement != null) {
+                    banco.preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return sucesso;
+    }
+
+    public static void excluirEndereco(Endereco endereco, DataBaseConection banco) {
+        try {
+            String sqlEndereco = "DELETE FROM enderecos WHERE cod_endereco = ?";
+            banco.preparedStatement = banco.connection.prepareStatement(sqlEndereco);
+            banco.preparedStatement.setInt(1, endereco.getCodEndereco());
+
+            int linhasAfetadasEndereco = banco.preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+        }
+    }
+
 }
 
