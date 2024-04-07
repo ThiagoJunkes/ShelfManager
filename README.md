@@ -1,6 +1,6 @@
 # ShelfManager
 ### Trabalho para a disciplina de Banco de Dados 2 do curso de Análise e Desenvolvimento de Sistemas da UDESC.
-#### Desenvolvido em Java 22 com o framework X, utilizando PostgreSQL
+#### Desenvolvido em Java 22, utilizando PostgreSQL.
 
 # Recursos utilizados para o desenvolvimento do projeto
 - PostgreSQL (versão 16.2);
