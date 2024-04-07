@@ -18,6 +18,8 @@ public class Cliente {
     private Date dataCadastro;
     private int codEndereco;
 
+    public Endereco endereco;
+
     // Getters e Setters
     public int getCodCliente() {
         return codCliente;
@@ -90,7 +92,6 @@ public class Cliente {
         System.out.println("3 - CPF:           " + cpf);
         System.out.println("4 - Email:         " + emailCliente);
         System.out.println("5 - Telefone:      " + telefoneCliente);
-        System.out.println("6 - Cod Endereco:  " + codEndereco);
     }
 
     public static boolean editarCliente(Cliente cliente, DataBaseConection banco) {
@@ -139,11 +140,12 @@ public class Cliente {
         ResultSet resultSet = null;
 
         try{
-            String sql = "SELECT * FROM clientes ORDER BY cod_cliente";
+            String sql = "SELECT c.*, e.* FROM clientes c JOIN enderecos e on c.cod_endereco = e.cod_endereco ORDER BY cod_cliente";
             resultSet = banco.statement.executeQuery(sql);
 
             while (resultSet.next()) {
                 Cliente cliente = new Cliente();
+                Endereco endereco = new Endereco();
 
                 cliente.codCliente = resultSet.getInt("cod_cliente");
                 cliente.nome = resultSet.getString("nome");
@@ -153,7 +155,14 @@ public class Cliente {
                 cliente.telefoneCliente = resultSet.getString("telefone_cliente");
                 cliente.dataCadastro = resultSet.getDate("data_cadastro");
                 cliente.codEndereco = resultSet.getInt("cod_endereco");
+                endereco.setCodEndereco(resultSet.getInt("cod_endereco"));
+                endereco.setRua(resultSet.getString("rua"));
+                endereco.setCidade(resultSet.getString("cidade"));
+                endereco.setEstado(resultSet.getString("estado"));
+                endereco.setCep(resultSet.getInt("cep"));
+                endereco.setComplemento(resultSet.getString("complemento"));
 
+                cliente.endereco = endereco;
                 clientes.add(cliente);
             }
 
