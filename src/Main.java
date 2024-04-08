@@ -39,7 +39,7 @@ public class Main {
                     break;
                 case "5":
                     System.out.println("Opção Estoque selecionada.");
-                    Menu.estoque();
+                    opcaoEstoque(banco);
                     break;
                 case "6":
                     System.out.println("Opção Relatórios selecionada.");
@@ -169,6 +169,7 @@ public class Main {
                                     }else{
                                         System.out.println("Ultrapassou o limite de caracteres!");
                                     }
+                                    break;
                                 case 2:
                                     System.out.print("Digite o sobrenome: ");
                                     String sobrenome = scanner.nextLine();
@@ -177,6 +178,7 @@ public class Main {
                                     }else{
                                         System.out.println("Ultrapassou o limite de caracteres!");
                                     }
+                                    break;
                                 case 3:
                                     System.out.print("Digite o novo CPF: ");
                                     long cpf = Long.parseLong(scanner.nextLine());
@@ -722,5 +724,55 @@ public class Main {
         }
     }
 
+    private static void opcaoEstoque(DataBaseConection banco){
+        Scanner scanner = new Scanner(System.in);
 
+        List<Estoque> estoques = Estoque.buscarEstoque(banco);
+        Menu.estoque(estoques);
+        System.out.println("* Ao adicionar um Livro ele automaticamente aparece em estoque.");
+        System.out.println("* Não é possivel excluir diretamente no estoque.");
+        System.out.println("* Acesse o Menu de Livros e exclua um Livro para o seu estoque ser excluido.");
+        System.out.println(" 0 - Menu Inicial | 1 - Editar Estoque ");
+        System.out.print("Escolha uma opção: ");
+        String escolha = scanner.nextLine();
+        switch (escolha){
+            case "0":
+                break;
+            case "1":
+                System.out.print("Digite o código do livro que deseja alterar o estoque:");
+                try{
+                    int escolhaEst = Integer.parseInt(scanner.nextLine());
+                    boolean hasEstoque = false;
+                    Estoque estoqueEditar = new Estoque();
+                    for (Estoque est : estoques) {
+                        if(est.getCodLivro() == escolhaEst){
+                            hasEstoque = true;
+                            estoqueEditar = est;
+                            break;
+                        }
+                    }
+                    if(hasEstoque){
+                        estoqueEditar.printEstoqueSemFormatacao();
+                        System.out.print("Digite a nova quantidade no estoque: ");
+                        int quantidade = Integer.parseInt(scanner.nextLine());
+                        while(quantidade < 0){
+                            System.out.println("A quantidade deve ser maior que 0!");
+                            System.out.print("Digite a nova quantidade no estoque: ");
+                            quantidade = Integer.parseInt(scanner.nextLine());
+
+                        }
+                        estoqueEditar.setQtdEstoque(quantidade);
+                        Estoque.editarEstoque(estoqueEditar, banco);
+                    }
+                    else {
+                        System.out.println("Livro não encontrado no estoque!");
+                    }
+                } catch (Exception e){
+                    System.out.println("Opção Inválida");
+                }
+                break;
+            default:
+                System.out.println("Opção Inválida!");
+        }
+    }
 }

@@ -129,15 +129,7 @@ public class Cliente {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (banco.preparedStatement != null) {
-                    banco.preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Nenhum cliente atualizado.");
         }
 
         return sucesso;
@@ -176,7 +168,7 @@ public class Cliente {
             }
 
         }catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Erro ao buscar Clientes: " + e.getMessage());
         }
 
         return  clientes;
@@ -226,15 +218,7 @@ public class Cliente {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (banco.preparedStatement != null) {
-                    banco.preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Falha ao adicionar cliente.");
         }
 
         return sucesso;
@@ -267,14 +251,6 @@ public class Cliente {
             rs.close();
         } catch (SQLException e) {
             System.out.println("Falha ao excluir cliente.");
-        } finally {
-            try {
-                if (banco.preparedStatement != null) {
-                    banco.preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
