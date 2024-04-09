@@ -88,6 +88,9 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
 
 # Configurar o Classpath na IDE
 
+### Observação: 
+- Ao criar um projeto em Java que possui uma classe principal, a IDE copia, automaticamente, todos os arquivos JAR na pasta do projeto para a pasta dist/lib do mesmo. A IDE também adiciona cada um dos arquivos JAR ao elemento Class-Path na aplicação (MANIFEST.MF).
+
 ## Eclipse
 
 1. Clique com o botão direito no projeto no "Project Explorer".
