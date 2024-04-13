@@ -10,7 +10,7 @@ public class TesteConexao {
         String port = "5432"; // porta padrão do PostgreSQL
         String databaseName = "ShelfManager"; // nome do banco de dados que você criou
         String username = "postgres"; // seu nome de usuário do PostgreSQL
-        String password = "admin"; // sua senha do PostgreSQL
+        String password = "batata"; // sua senha do PostgreSQL
 
         String connectionString = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName +
                 "?user=" + username + "&password=" + password;
