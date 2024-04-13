@@ -1,6 +1,6 @@
 # ShelfManager
 ### Trabalho para a disciplina de Banco de Dados 2 do curso de Análise e Desenvolvimento de Sistemas da UDESC.
-#### Desenvolvido em Java 22 com o framework X, utilizando PostgreSQL
+#### Desenvolvido em Java 22, utilizando PostgreSQL.
 
 # Recursos utilizados para o desenvolvimento do projeto
 - PostgreSQL (versão 16.2);
@@ -87,6 +87,9 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
    );
 
 # Configurar o Classpath na IDE
+
+### Observação: 
+- Ao criar um projeto em Java que possui uma classe principal, a IDE copia, automaticamente, todos os arquivos JAR na pasta do projeto para a pasta dist/lib do mesmo. A IDE também adiciona cada um dos arquivos JAR ao elemento Class-Path na aplicação (MANIFEST.MF).
 
 ## Eclipse
 

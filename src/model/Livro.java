@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class Livro {
     private Date anoPublicacao;
     private double preco;
     private int codEditora;
+
+    private int qtdEstoque;
 
     public Editora editora;
 
@@ -86,8 +89,27 @@ public class Livro {
         this.codEditora = codEditora;
     }
 
+    public int getQtdEstoque() {
+        return qtdEstoque;
+    }
+
+    public void setQtdEstoque(int qtdEstoque) {
+        this.qtdEstoque = qtdEstoque;
+    }
+
     public void printLivroSemFormatacao(){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String dataFormatada = sdf.format(anoPublicacao);
+
         System.out.println("Livro: " + codLivro);
+        System.out.println("0 - Para voltar ao Menu e alterar a Editora no Menu Editoras");
+        System.out.println("1 - Título:            " + titulo);
+        System.out.println("2 - Gênero:            " + genero);
+        System.out.println("3 - Autor:             " + autor);
+        System.out.println("4 - ISBN:              " + isbn);
+        System.out.println("5 - Ano de Publicação: " + dataFormatada);
+        System.out.println("6 - Preço:             " + preco);
+        System.out.println("7 - Editora:           " + editora.getCodEditora() + " | " + editora.getNomeEditora());
     }
 
     public static List<Livro> buscarLivros(DataBaseConection banco){
@@ -95,7 +117,7 @@ public class Livro {
         ResultSet resultSet = null;
 
         try{
-            String sql = "SELECT l.*, e.* FROM livros l JOIN editoras e ON e.cod_editora = l.cod_editora";
+            String sql = "SELECT l.*, e.* FROM livros l JOIN editoras e ON e.cod_editora = l.cod_editora ORDER BY l.cod_livro";
             resultSet = banco.statement.executeQuery(sql);
 
             while (resultSet.next()) {
@@ -128,24 +150,43 @@ public class Livro {
     }
 
     public static boolean adicionarLivro(Livro livro, DataBaseConection banco) {
-        String sql = "INSERT INTO livros (titulo, genero, autor, isbn, ano_publicacao, preco, cod_editora) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try {
-            PreparedStatement statement = banco.connection.prepareStatement(sql);
-            statement.setString(1, livro.getTitulo());
-            statement.setString(2, livro.getGenero());
-            statement.setString(3, livro.getAutor());
-            statement.setLong(4, livro.getIsbn());
-            statement.setDate(5, livro.getAnoPublicacao());
-            statement.setDouble(6, livro.getPreco());
-            statement.setInt(7, livro.getCodEditora());
+        String sqlLivro = "INSERT INTO livros (titulo, genero, autor, isbn, ano_publicacao, preco, cod_editora) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlEstoque = "INSERT INTO estoque (cod_livro, qtd_estoque) VALUES (?, ?)";
 
-            int rowsInserted = statement.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("Novo livro adicionado com sucesso!");
-                return true;
+        try {
+            // Inserindo o livro na tabela livros
+            PreparedStatement statementLivro = banco.connection.prepareStatement(sqlLivro, PreparedStatement.RETURN_GENERATED_KEYS);
+            statementLivro.setString(1, livro.getTitulo());
+            statementLivro.setString(2, livro.getGenero());
+            statementLivro.setString(3, livro.getAutor());
+            statementLivro.setLong(4, livro.getIsbn());
+            statementLivro.setDate(5, livro.getAnoPublicacao());
+            statementLivro.setDouble(6, livro.getPreco());
+            statementLivro.setInt(7, livro.getCodEditora());
+
+            int rowsInsertedLivro = statementLivro.executeUpdate();
+
+            // Obtendo o código do livro inserido
+            ResultSet generatedKeys = statementLivro.getGeneratedKeys();
+            int codLivroInserido = -1;
+            if (generatedKeys.next()) {
+                codLivroInserido = generatedKeys.getInt(1);
+            }
+
+            if (rowsInsertedLivro > 0 && codLivroInserido != -1) {
+                // Inserindo a quantidade em estoque na tabela estoque
+                PreparedStatement statementEstoque = banco.connection.prepareStatement(sqlEstoque);
+                statementEstoque.setInt(1, codLivroInserido);
+                statementEstoque.setInt(2, livro.getQtdEstoque());
+
+                int rowsInsertedEstoque = statementEstoque.executeUpdate();
+
+                if (rowsInsertedEstoque > 0) {
+                    return true;
+                }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            return false;
         }
         return false;
     }
@@ -169,27 +210,54 @@ public class Livro {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            return false;
         }
         return false;
     }
 
     public static boolean excluirLivro(Livro livro, DataBaseConection banco) {
-        String sql = "DELETE FROM livros WHERE cod_livro=?";
-        try {
-            PreparedStatement statement = banco.connection.prepareStatement(sql);
-            statement.setInt(1, livro.getCodLivro());
+        String sqlVendas = "SELECT COUNT(*) AS total_vendas FROM itens_vendas WHERE cod_livro=?";
+        String sqlExcluirEstoque = "DELETE FROM estoque WHERE cod_livro=?";
+        String sqlExcluirLivro = "DELETE FROM livros WHERE cod_livro=?";
 
-            int rowsDeleted = statement.executeUpdate();
+        try {
+            // Verifica se há vendas relacionadas a este livro
+            PreparedStatement statementVendas = banco.connection.prepareStatement(sqlVendas);
+            statementVendas.setInt(1, livro.getCodLivro());
+            ResultSet rsVendas = statementVendas.executeQuery();
+
+            int totalVendas = 0;
+            if (rsVendas.next()) {
+                totalVendas = rsVendas.getInt("total_vendas");
+            }
+
+            if (totalVendas > 0) {
+                System.out.println("Não é possível excluir um livro pos ele já possui uma venda!");
+                return false;
+            }
+
+            // Se não há vendas, exclui o livro do estoque
+            PreparedStatement statementExcluirEstoque = banco.connection.prepareStatement(sqlExcluirEstoque);
+            statementExcluirEstoque.setInt(1, livro.getCodLivro());
+            statementExcluirEstoque.executeUpdate();
+
+            // Exclui o livro da tabela livros
+            PreparedStatement statementExcluirLivro = banco.connection.prepareStatement(sqlExcluirLivro);
+            statementExcluirLivro.setInt(1, livro.getCodLivro());
+
+            int rowsDeleted = statementExcluirLivro.executeUpdate();
             if (rowsDeleted > 0) {
                 System.out.println("Livro excluído com sucesso!");
                 return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
+
         return false;
     }
+
 
 }
 

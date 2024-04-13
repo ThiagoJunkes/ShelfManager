@@ -82,15 +82,30 @@ public class Menu {
     }
 
 
-    public static void estoque(){
-        System.out.println("Estoque");
+    public static void estoque(List<Estoque> estoque){
+        System.out.println("| Cod Livro |  Quantidade  |  Título do Livro          | ISBN            |");
+        System.out.println("|-----------|--------------|---------------------------|-----------------|");
+
+        for (Estoque est : estoque) {
+            // Limitando o tamanho dos campos
+            String quantidade = String.valueOf(est.getQtdEstoque());
+            String titulo = est.livro.getTitulo().length() > 25 ? est.livro.getTitulo().substring(0, 25) : est.livro.getTitulo();
+            String isbn = String.valueOf(est.livro.getIsbn());
+
+            System.out.printf("| %-9d | %-12s | %-25s | %-15s |\n",
+                    est.getCodLivro(),
+                    quantidade,
+                    titulo,
+                    isbn);
+        }
+        System.out.println("|-----------|--------------|---------------------------|-----------------|");
     }
 
     public static void livros(List<Livro> livros) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        System.out.println("|Cod Livro | Título                  | Gênero               | Autor           | ISBN            | Ano Publicação  | Preço  | Cod Editora | Nome da Editora         |");
-        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|--------|-------------|-------------------------|");
+        System.out.println("|Cod Livro | Título                  | Gênero               | Autor           | ISBN            | Ano Publicação  | Preço    | Cod Editora | Nome da Editora         |");
+        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|----------|-------------|-------------------------|");
 
         for (Livro livro : livros) {
             // Limitando o tamanho dos campos
@@ -103,7 +118,7 @@ public class Menu {
             String codEditora = String.valueOf(livro.getCodEditora());
             String nomeEditora = livro.editora.getNomeEditora().length() > 25 ? livro.editora.getNomeEditora().substring(0, 25) : livro.editora.getNomeEditora();
 
-            System.out.printf("| %-8d | %-23s | %-20s | %-15s | %-15s | %-15s | %-6s | %-11s | %-23s |\n",
+            System.out.printf("| %-8d | %-23s | %-20s | %-15s | %-15s | %-15s | %-8s | %-11s | %-23s |\n",
                     livro.getCodLivro(),
                     titulo,
                     genero,
@@ -114,8 +129,9 @@ public class Menu {
                     codEditora,
                     nomeEditora);
         }
-        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|--------|-------------|-------------------------|");
+        System.out.println("|----------|-------------------------|----------------------|-----------------|-----------------|-----------------|----------|-------------|-------------------------|");
     }
+
 
 
 
