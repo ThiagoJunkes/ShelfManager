@@ -135,9 +135,45 @@ public class Menu {
 
 
 
-    public static void vendas(){
-        System.out.println("Vendas");
+    public static void vendas(List<ItemVenda> itemVendas) {
+        int codPedido = 0;
+        boolean primeiraLinha = true;
+        for (ItemVenda venda : itemVendas) {
+            if (codPedido != venda.getCodPedido()) {
+                String nomeCompleto = venda.cliente.getNome() + " " + venda.cliente.getSobrenome();
+                nomeCompleto = nomeCompleto.length() > 20 ? nomeCompleto.substring(0, 17) + "..." : nomeCompleto;
+
+                String valorVenda = "R$" + venda.venda.getValorVenda();
+                valorVenda = valorVenda.length() > 12 ? valorVenda.substring(0, 9) + "..." : valorVenda;
+
+                String metodoPag = venda.venda.getMetodoPag();
+                metodoPag = metodoPag.length() > 21 ? metodoPag.substring(0, 18) + "..." : metodoPag;
+                if(!primeiraLinha) {
+                    System.out.println("------------------------------------------------------------------------------");
+                    System.out.println();
+                }
+                System.out.println("------------------------------------------------------------------------------");
+                System.out.printf("| Venda: %-5d | %-20s | %-12s | %-21s |\n", // total 70 carac
+                        venda.getCodPedido(),
+                        nomeCompleto,
+                        valorVenda,
+                        metodoPag
+                );
+                codPedido = venda.getCodPedido();
+                System.out.println("------------------------------------------------------------------------------");
+                primeiraLinha = false;
+            }
+
+            String precoLivro = "R$" + String.valueOf(venda.livro.getPreco());
+            String qtdLivros = String.valueOf(venda.getQtdLivros());
+            String tituloLivro = venda.livro.getTitulo();
+            tituloLivro = tituloLivro.length() > 46 ? tituloLivro.substring(0, 43) + "..." : tituloLivro;
+
+            System.out.printf("| %-14s | %-8s | %-46s |\n", precoLivro, qtdLivros, tituloLivro);
+        }
+        System.out.println("------------------------------------------------------------------------------");
     }
+
 
     public static void relatorios(){
         System.out.println("Cliente");

@@ -85,6 +85,18 @@ public class Cliente {
         this.codEndereco = codEndereco;
     }
 
+    public void printClienteFormatado(){
+        String nomeFormatado = nome;
+        nomeFormatado = nomeFormatado.length() > 20 ? nomeFormatado.substring(0, 20) : nomeFormatado;
+        String sobrenomeFormatado = sobrenome;
+        sobrenomeFormatado = sobrenomeFormatado.length() > 20 ? sobrenomeFormatado.substring(0, 20) : sobrenomeFormatado;
+        System.out.printf("%-5d | %-20s | %-20s | %-20s \n", // total 70 carac
+                codCliente,
+                nomeFormatado,
+                sobrenomeFormatado,
+                cpf
+        );
+    }
     public void printClienteSemFormatacao() {
         System.out.println("Cliente: " + codCliente + " | Data Cadastro: " + dataCadastro);
         System.out.println("1 - Nome:          " + nome);

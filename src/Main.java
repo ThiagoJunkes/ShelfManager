@@ -35,7 +35,7 @@ public class Main {
                     break;
                 case "4":
                     System.out.println("Opção Vendas selecionada.");
-                    Menu.vendas();
+                    opcaoVendas(banco);
                     break;
                 case "5":
                     System.out.println("Opção Estoque selecionada.");
@@ -773,6 +773,58 @@ public class Main {
                 break;
             default:
                 System.out.println("Opção Inválida!");
+        }
+    }
+
+    private static void opcaoVendas(DataBaseConection banco){
+        Scanner scanner = new Scanner(System.in);
+
+        List<ItemVenda> itensVendas = ItemVenda.buscarItensVenda(banco);
+        Menu.vendas(itensVendas);
+        System.out.println(" 0 - Menu Inicial | 1 - Adicionar Venda | 2 - Editar Venda | 3 - Excluir Venda ");
+        System.out.print("Escolha uma opção: ");
+        String escolhaVenda = scanner.nextLine();
+        switch (escolhaVenda) {
+            case "1":
+                List<Cliente> clientes = Cliente.buscarClientes(banco);
+                System.out.println("Código| Nome                 | Sobrenome            | CPF");
+                for (Cliente cliente: clientes) {
+                    cliente.printClienteFormatado();
+                }
+                boolean clienteValido = false;
+                int codCliente = 0;
+
+                do{
+                    try {
+                        System.out.println("Digite 0 para voltar ao Menu Inicial ou ");
+                        System.out.print("Digite o código do cliente que realizou a compra: ");
+                        codCliente = Integer.parseInt(scanner.nextLine());
+
+                        if(codCliente == 0) break; // Volta ao Menu Inicial
+
+                        for (Cliente cliente: clientes) {
+                            if (cliente.getCodCliente() == codCliente) {
+                                clienteValido = true;
+                                break;
+                            }
+                        }
+
+                        if(!clienteValido) System.out.println("Código Inválido!");
+                    } catch (Exception e){
+                        System.out.println("Código Inválido!");
+                    }
+                } while (!clienteValido);
+                if(!clienteValido) break;
+
+                //Selecione 0 para nao adicionar mais livros
+
+                break;
+            case "2":
+                break;
+            case "3":
+                break;
+            default:
+                System.out.println("Carregando Menu Inicial...");
         }
     }
 }

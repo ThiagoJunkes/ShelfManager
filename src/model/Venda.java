@@ -52,6 +52,10 @@ public class Venda {
         return codCliente;
     }
 
+    public void setCodCliente(int codCliente){
+        this.codCliente = codCliente;
+    }
+
     public static List<Venda> buscarVendas(DataBaseConection banco){
         List<Venda> vendas = new ArrayList<>();
         ResultSet resultSet = null;

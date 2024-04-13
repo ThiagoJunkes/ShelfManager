@@ -97,6 +97,19 @@ public class Livro {
         this.qtdEstoque = qtdEstoque;
     }
 
+    public void printLivroFormatado(){
+        String tituloFormatado = titulo;
+        tituloFormatado = tituloFormatado.length() > 20 ? tituloFormatado.substring(0, 20) : tituloFormatado;
+
+        String sobrenomeFormatado = sobrenome;
+        sobrenomeFormatado = sobrenomeFormatado.length() > 20 ? sobrenomeFormatado.substring(0, 20) : sobrenomeFormatado;
+        System.out.printf("%-5d | %-20s | %-20s | %-20s \n", // total 70 carac
+                codCliente,
+                nomeFormatado,
+                sobrenomeFormatado,
+                cpf
+        );
+    }
     public void printLivroSemFormatacao(){
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String dataFormatada = sdf.format(anoPublicacao);
