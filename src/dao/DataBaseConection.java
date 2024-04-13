@@ -7,7 +7,7 @@ public class DataBaseConection {
     private String port = "5432"; // porta padrão do PostgreSQL
     private String databaseName = "ShelfManager"; // nome do banco de dados
     private String username = "postgres"; // nome de usuário do PostgreSQL
-    private String password = "admin"; // senha do PostgreSQL
+    private String password = "batata"; // senha do PostgreSQL
 
     private String connectionString = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName + "?user=" + username + "&password=" + password;
 
@@ -19,7 +19,7 @@ public class DataBaseConection {
 
         // Estabelecer conexão
         connection = DriverManager.getConnection(connectionString);
-        System.out.println("Conexão com o Banco de Dados estabelecida com sucesso!");
+        //System.out.println("Conexão com o Banco de Dados estabelecida com sucesso!");
 
         // Criar uma declaração
         statement = connection.createStatement();
