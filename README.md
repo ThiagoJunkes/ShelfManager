@@ -29,12 +29,12 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
 
    ```sql
    CREATE TABLE enderecos (
-    cod_endereco SERIAL PRIMARY KEY,
-    rua VARCHAR(100),
-    cidade VARCHAR(100),
-    estado VARCHAR(100),
-    cep INT,
-    complemento VARCHAR(100)
+       cod_endereco SERIAL PRIMARY KEY,
+       rua VARCHAR(100),
+       cidade VARCHAR(100),
+       estado VARCHAR(100),
+       cep INT,
+       complemento VARCHAR(100)
    );
 
    CREATE TABLE editoras (
@@ -61,7 +61,7 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
        cod_cliente SERIAL PRIMARY KEY,
        nome VARCHAR(50) NOT NULL,
        sobrenome VARCHAR(250) NOT NULL,
-   		cpf BIGINT NOT NULL,
+       cpf BIGINT NOT NULL,
        email_cliente VARCHAR(100) UNIQUE,
        telefone_cliente VARCHAR(15),
        data_cadastro DATE DEFAULT CURRENT_DATE,
