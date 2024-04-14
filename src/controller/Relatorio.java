@@ -19,6 +19,7 @@ public class Relatorio {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Digite o caminho da pasta de destino para os relatórios: ");
         path_destino = scanner.nextLine();
+        if(!path_destino.endsWith("\\")) path_destino += "\\";
         System.out.println("Pasta de destino definida para: " + path_destino);
     }
 
