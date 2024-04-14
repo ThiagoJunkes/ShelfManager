@@ -104,7 +104,7 @@ public class Venda {
             else      sqlItensVendas += ", (?, "+ itens[0] + ", " + itens[1] + ")";
             first = false;
         }
-        System.out.println(sqlItensVendas);
+
         try {
 
             PreparedStatement statementVendas = banco.connection.prepareStatement(sqlVendas, PreparedStatement.RETURN_GENERATED_KEYS);

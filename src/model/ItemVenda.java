@@ -4,6 +4,7 @@ import dao.DataBaseConection;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,29 @@ public class ItemVenda {
 
     public void setQtdLivros(int qtdLivros) {
         this.qtdLivros = qtdLivros;
+    }
+
+    public void printItemVendaFormatado(){
+        System.out.println("-------------------------------------------------");
+        System.out.println("Código Livro: " + codLivro);
+        System.out.println("  Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
+        System.out.println("  Quantidade: " + qtdLivros);
+        System.out.println("  Metodo de Pagamento: " + venda.getMetodoPag());
+        System.out.println("  Cliente: " + cliente.getNome() + " " + cliente.getSobrenome() + " CPF: " + cliente.getCpf());
+    }
+
+    public void printItemVendaSemFormatacao(){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String dataFormatada = sdf.format(venda.getDataVenda());
+
+        System.out.println("Venda: " + codPedido);
+        System.out.println("1 - Código Livro:        " + codLivro);
+        System.out.println("Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
+        System.out.println("2 - Quantidade:          " + qtdLivros);
+        System.out.println("3 - Metodo de Pagamento: " + venda.getMetodoPag());
+        System.out.println("4 - Data da Venda:       " + dataFormatada);
+        System.out.println("5 - Código Cliente:      " + cliente.getCodCliente());
+        System.out.println("Cliente: " + cliente.getNome() + " " + cliente.getSobrenome() + " CPF: " + cliente.getCpf());
     }
 
     public static List<ItemVenda> buscarItensVenda(DataBaseConection banco){
@@ -99,5 +123,36 @@ public class ItemVenda {
         return itensVendas;
     }
 
+    public static void editarItemVenda(DataBaseConection banco, ItemVenda venda, int codLivroOriginal){
+        try{
+            String sqlVendas = "UPDATE vendas SET metodo_pag = ?, cod_cliente = ?, data_venda = ? "+
+                               "WHERE cod_venda = ?";
 
+            String sqlItemVenda = "UPDATE itens_vendas SET cod_livro = ?, qtd_livros = ? " +
+                                  "WHERE cod_livro = ? AND cod_pedido = ?";
+
+            banco.preparedStatement = banco.connection.prepareStatement(sqlVendas);
+
+            banco.preparedStatement.setString(1, venda.venda.getMetodoPag());
+            banco.preparedStatement.setInt(2, venda.cliente.getCodCliente());
+            banco.preparedStatement.setDate(3, venda.venda.getDataVenda());
+            banco.preparedStatement.setInt(4, venda.getCodPedido());
+
+            banco.preparedStatement.executeUpdate();
+
+
+            banco.preparedStatement = banco.connection.prepareStatement(sqlItemVenda);
+
+            banco.preparedStatement.setInt(1, venda.livro.getCodLivro());
+            banco.preparedStatement.setInt(2, venda.getQtdLivros());
+            banco.preparedStatement.setInt(3, codLivroOriginal);
+            banco.preparedStatement.setInt(4, venda.getCodPedido());
+
+            banco.preparedStatement.executeUpdate();
+            System.out.println("Venda atualizada com sucesso!");
+        }
+        catch (Exception e){
+            System.out.println("Não foi possivel atualizar Venda!");
+        }
+    }
 }

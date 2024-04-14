@@ -893,11 +893,165 @@ public class Main {
                         System.out.println("Valor Inválido!");
                     }
                 }
-                Venda.adicionarItemVenda(banco, codCliente, metodoPag, 4, livrosVendidos);
+                Venda.adicionarItemVenda(banco, codCliente, metodoPag, precoTotal, livrosVendidos);
                 break;
             case "2":
+                try{
+                    int escolha = 0;
+                    ItemVenda editarVenda = new ItemVenda();
+                    int codLivroOriginal = 0;
+                    boolean editarExiste = false;
+
+                    while (!editarExiste){
+                        System.out.print("Digite o código da venda que deseja editar: ");
+                        escolha = Integer.parseInt(scanner.nextLine());
+
+                        for (ItemVenda venda: itensVendas) {
+                            if(escolha == venda.getCodPedido()){
+                                venda.printItemVendaFormatado();
+                                editarExiste = true;
+                            }
+                        }
+                    }
+                    int escolhaLivro = 0;
+                    while(escolhaLivro < 1){
+                        try{
+                            System.out.print("Digite o código do livro que deseja editar: ");
+                            escolhaLivro = Integer.parseInt(scanner.nextLine());
+
+                            for (ItemVenda venda: itensVendas) {
+                                if(escolha == venda.getCodPedido() && escolhaLivro == venda.livro.getCodLivro()){
+                                    venda.printItemVendaSemFormatacao();
+                                    editarVenda = venda;
+                                    codLivroOriginal = escolha;
+                                    break;
+                                }
+                            }
+                        } catch (Exception e){
+                            System.out.println("Opção Inválida!");
+                        }
+                    }
+
+                    escolha = 0;
+                    while(escolha < 1 || escolha > 5){
+                        try{
+                            System.out.print("Digite o número do item que deseja editar: ");
+                            escolha = Integer.parseInt(scanner.nextLine());
+                        }catch (Exception e){
+                            System.out.println("Opção Inválida!");
+                        }
+                    }
+
+                    boolean editar = true;
+
+                    switch (escolha){
+                        case 1:
+                            List<Livro> livros1 = Livro.buscarLivros(banco);
+                            System.out.println("----------------------------------------------------------------------");
+                            for (Livro livro: livros1) {
+                                livro.printLivroFormatado();
+                            }
+                            escolhaLivro = 0;
+                            boolean valido = false;
+                            while(!valido){
+                                try{
+                                    System.out.print("Digite o código do livro: ");
+                                    escolhaLivro = Integer.parseInt(scanner.nextLine());
+
+                                    for (Livro livro: livros1) {
+                                        if(escolhaLivro == livro.getCodLivro()){
+                                            valido = true;
+                                            editarVenda.livro = livro;
+                                            break;
+                                        }
+                                    }
+                                } catch (Exception e){
+                                    System.out.println("Opção Inválida!");
+                                }
+                            }
+                            ItemVenda.editarItemVenda(banco, editarVenda, codLivroOriginal);
+                            break;
+                        case 2:
+                            int qtdNova = 0;
+                            while(qtdNova < 1){
+                                try{
+                                    System.out.print("Digite a nova quantidade: ");
+                                    qtdNova = Integer.parseInt(scanner.nextLine());
+                                } catch (Exception e){
+                                    System.out.println("Opção Inválida!");
+                                }
+                            }
+                            editarVenda.setQtdLivros(qtdNova);
+                            ItemVenda.editarItemVenda(banco, editarVenda, codLivroOriginal);
+                            break;
+                        case 3:
+                            int i = 1;
+                            for (String pagamento: Venda.metodosPagamento) {
+                                System.out.println(i + " | " + pagamento);
+                                i++;
+                            }
+                            int novoMetodoPag = 0;
+                            while(novoMetodoPag < 1 || novoMetodoPag > 5){
+                                try{
+                                    System.out.print("Escolha o método de pagamento: ");
+                                    novoMetodoPag = Integer.parseInt(scanner.nextLine());
+                                } catch (Exception e){
+                                    System.out.println("Opção Inválida!");
+                                }
+                            }
+                            editarVenda.venda.setMetodoPag(Venda.metodosPagamento[novoMetodoPag-1]);
+                            ItemVenda.editarItemVenda(banco, editarVenda, codLivroOriginal);
+                            break;
+                        case 4:
+                            String data = "";
+                            do{
+                                System.out.print("Nova data de venda (DD/MM/AAAA): ");
+                                data = scanner.next();
+                                if (!data.matches("^\\d{2}/\\d{2}/\\d{4}$")) {
+                                    System.out.println("Formato de data inválido! Use DD/MM/AAAA.");
+                                }
+                            }while(!data.matches("^\\d{2}/\\d{2}/\\d{4}$"));
+
+                            SimpleDateFormat sdfInput = new SimpleDateFormat("dd/MM/yyyy");
+                            java.util.Date parsedDate = sdfInput.parse(data);
+                            Date sqlDate = new Date(parsedDate.getTime());
+
+                            editarVenda.venda.setDataVenda(sqlDate);
+                            ItemVenda.editarItemVenda(banco, editarVenda, codLivroOriginal);
+                            break;
+                        case 5:
+                            List<Cliente> clientes1 = Cliente.buscarClientes(banco);
+                            System.out.println("----------------------------------------------------------------------");
+                            for (Cliente cliente: clientes1) {
+                                cliente.printClienteFormatado();
+                            }
+                            int escolhaCliente = 0;
+                            boolean validoC = false;
+                            while(!validoC){
+                                try{
+                                    System.out.print("Digite o código do cliente: ");
+                                    escolhaCliente = Integer.parseInt(scanner.nextLine());
+
+                                    for (Cliente cliente: clientes1) {
+                                        if(escolhaCliente == cliente.getCodCliente()){
+                                            validoC = true;
+                                            editarVenda.cliente = cliente;
+                                            break;
+                                        }
+                                    }
+                                } catch (Exception e){
+                                    System.out.println("Opção Inválida!");
+                                }
+                            }
+                            ItemVenda.editarItemVenda(banco, editarVenda, codLivroOriginal);
+                            break;
+                    }
+                } catch (Exception e) {
+                    System.out.println("Opção Inválida!");
+                }
                 break;
             case "3":
+
                 break;
             default:
                 System.out.println("Carregando Menu Inicial...");
