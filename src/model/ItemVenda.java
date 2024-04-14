@@ -2,6 +2,7 @@ package model;
 
 import dao.DataBaseConection;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -153,6 +154,32 @@ public class ItemVenda {
         }
         catch (Exception e){
             System.out.println("Não foi possivel atualizar Venda!");
+        }
+    }
+
+    public static void excluirItemVenda(DataBaseConection banco, ItemVenda itemVenda) {
+
+        String sqlVenda=      "DELETE FROM vendas WHERE cod_venda = ?";
+        String sqlItemVenda = "DELETE FROM itens_vendas WHERE cod_pedido = ?";
+
+        try {
+            PreparedStatement statementExcluirIV = banco.connection.prepareStatement(sqlItemVenda);
+            statementExcluirIV.setInt(1, itemVenda.getCodPedido());
+
+            statementExcluirIV.executeUpdate();
+
+            PreparedStatement statementExcluirV = banco.connection.prepareStatement(sqlVenda);
+            statementExcluirV.setInt(1, itemVenda.venda.getCodVenda());
+
+            int rowsDeleted = statementExcluirV.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                System.out.println("Livro excluído com sucesso!");
+            } else{
+                System.out.println("Não foi possivel excluir Venda!");
+            }
+        } catch (SQLException e) {
+            System.out.println("Não foi possivel excluir Venda!");
         }
     }
 }

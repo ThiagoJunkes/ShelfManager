@@ -942,8 +942,6 @@ public class Main {
                         }
                     }
 
-                    boolean editar = true;
-
                     switch (escolha){
                         case 1:
                             List<Livro> livros1 = Livro.buscarLivros(banco);
@@ -1049,9 +1047,37 @@ public class Main {
                 } catch (Exception e) {
                     System.out.println("Opção Inválida!");
                 }
+                System.out.println("Ao alterar a venda o estoque não é alterado!");
                 break;
             case "3":
+                int escolha = 0;
+                boolean excluirValido = false;
+                ItemVenda excluirVenda = new ItemVenda();
+                while (!excluirValido){
+                    try{
+                        System.out.print("Digite o código da venda que deseja excluir: ");
+                        escolha = Integer.parseInt(scanner.nextLine());
 
+                        for (ItemVenda venda: itensVendas) {
+                            if(escolha == venda.getCodPedido()){
+                                excluirVenda = venda;
+                                excluirValido = true;
+                                break;
+                            }
+                        }
+                    } catch (Exception e){
+                        System.out.println("Opção Inválida!");
+                    }
+                }
+
+                System.out.println("Você escolheu a venda: ");
+                excluirVenda.printItemVendaFormatado();
+                System.out.println("Ao excluir a venda o estoque não é alterado!");
+                System.out.print("Tem certeza que deseja excluir essa venda (s/n)? ");
+                String resposta = scanner.nextLine();
+                if(resposta.toUpperCase().equals("SIM") || resposta.toUpperCase().equals("S")){
+                    ItemVenda.excluirItemVenda(banco, excluirVenda);
+                }
                 break;
             default:
                 System.out.println("Carregando Menu Inicial...");
