@@ -29,12 +29,12 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
 
    ```sql
    CREATE TABLE enderecos (
-       cod_endereco SERIAL PRIMARY KEY,
-       rua VARCHAR(100),
-       cidade VARCHAR(100),
-       estado VARCHAR(100),
-       cep INT,
-       complemento VARCHAR(100)
+    cod_endereco SERIAL PRIMARY KEY,
+    rua VARCHAR(100),
+    cidade VARCHAR(100),
+    estado VARCHAR(100),
+    cep INT,
+    complemento VARCHAR(100)
    );
 
    CREATE TABLE editoras (
@@ -44,7 +44,7 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
        email_editora VARCHAR(250) UNIQUE,
        telefone_editora VARCHAR(15)
    );
-
+   
    CREATE TABLE livros (
        cod_livro SERIAL PRIMARY KEY,
        titulo VARCHAR(250),
@@ -56,19 +56,19 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
        cod_editora INT,
        FOREIGN KEY (cod_editora) REFERENCES editoras(cod_editora)
    );
-
+   
    CREATE TABLE clientes (
        cod_cliente SERIAL PRIMARY KEY,
        nome VARCHAR(50) NOT NULL,
        sobrenome VARCHAR(250) NOT NULL,
-       cpf BIGINT NOT NULL,
+   		cpf BIGINT NOT NULL,
        email_cliente VARCHAR(100) UNIQUE,
        telefone_cliente VARCHAR(15),
        data_cadastro DATE DEFAULT CURRENT_DATE,
        cod_endereco INT,
        FOREIGN KEY (cod_endereco) REFERENCES enderecos(cod_endereco)
    );
-
+   
    CREATE TABLE vendas (
        cod_venda SERIAL PRIMARY KEY,
        valor_venda REAL,
@@ -77,13 +77,13 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
        cod_cliente INT,
        FOREIGN KEY (cod_cliente) REFERENCES clientes(cod_cliente)
    );
-
+   
    CREATE TABLE estoque (
        cod_livro INT NOT NULL,
        qtd_estoque INT,
        FOREIGN KEY (cod_livro) REFERENCES livros(cod_livro)
    );
-
+   
    CREATE TABLE itens_vendas (
        cod_pedido INT NOT NULL,
        cod_livro INT NOT NULL,
@@ -92,6 +92,25 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
        FOREIGN KEY (cod_pedido) REFERENCES vendas(cod_venda),
        FOREIGN KEY (cod_livro) REFERENCES livros(cod_livro)
    );
+   
+   -- Trigger
+   CREATE OR REPLACE FUNCTION atualizar_estoque()
+   RETURNS TRIGGER AS $$
+   BEGIN
+       -- Diminui a quantidade de livros vendidos do estoque
+       UPDATE estoque
+       SET qtd_estoque = qtd_estoque - NEW.qtd_livros
+       WHERE cod_livro = NEW.cod_livro;
+   
+       RETURN NEW;
+   END;
+   $$ LANGUAGE plpgsql;
+   
+   -- Associa a trigger a tabela de itens_vendas
+   CREATE TRIGGER atualizar_estoque_trigger
+   AFTER INSERT ON itens_vendas
+   FOR EACH ROW
+   EXECUTE FUNCTION atualizar_estoque();
    
 
 # Configurar o projeto no IntelliJ IDEA
