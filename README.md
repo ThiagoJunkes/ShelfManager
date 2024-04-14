@@ -12,10 +12,17 @@
 Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
 
 1. Abra o pgAdmin e conecte-se ao seu servidor PostgreSQL.
-   - Para isso, nomeie seu Servidor e seu Host (nesse caso, usaremos localhost).
+   - Para isso, nomeie seu Servidor como preferir.
+   - Seu Host será o 'localhost';
+   - A porta será a padrão '5432';
+   - O nome de usuário será 'postgres';
+   - A senha será 'admin';
 2. Clique com o botão direito em "Databases" e escolha "Create" -> "Database...".
-   - Nomeie o banco de dados como "ShelfManager".
+   - Nomeie o banco de dados como 'ShelfManager'.
    - Clique em "Save" ou "OK" para criar o banco de dados.
+
+   #### Observação: Quaisquer modificações no nome do host, port, databaseName, username ou password deverão ser ajustadas na conexão com o banco no Intellij IDEA.
+
 3. Agora que o banco de dados está criado, abra o Query Tool:
    - Clique com o botão direito no banco de dados "ShelfManager" e escolha "Query Tool...".
 4. Na janela do Query Tool, cole o seguinte script SQL e execute para criar as tabelas:
@@ -85,14 +92,38 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
        FOREIGN KEY (cod_pedido) REFERENCES vendas(cod_venda),
        FOREIGN KEY (cod_livro) REFERENCES livros(cod_livro)
    );
+   
 
-# Configurar o Classpath na IDE
+# Configurar o projeto no IntelliJ IDEA
+
+## Obtenha a URL do Repositório:
+1. Clique no botão verde "Code" e copie a URL fornecida. Certifique-se de selecionar a opção "Clone with HTTPS" se você estiver usando HTTPS ou "Clone with SSH" se estiver usando SSH.
+
+## Clone o Repositório:
+1. Abra o IntelliJ IDEA.
+2. Na tela de inicialização, escolha "Get from Version Control" ou vá para "File" -> "New" -> "Project from Version Control" -> "Git".
+3. Na caixa de diálogo que aparecer, cole a URL que você copiou anteriormente.
+4. Escolha o diretório onde deseja clonar o repositório localmente.
+5. Clique em "Clone" para iniciar o processo de clonagem.
+
+## Importe o Projeto para o IntelliJ IDEA:
+1. Após o processo de clonagem ser concluído, o IntelliJ IDEA abrirá automaticamente o projeto clonado.
+2. Se não abrir automaticamente, você pode importá-lo manualmente selecionando "File" -> "Open" e navegando até o diretório onde o repositório foi clonado.
+
+
+# Configurar o Classpath 
 
 ### Observação: 
 - Ao criar um projeto em Java que possui uma classe principal, a IDE copia, automaticamente, todos os arquivos JAR na pasta do projeto para a pasta dist/lib do mesmo. A IDE também adiciona cada um dos arquivos JAR ao elemento Class-Path na aplicação (MANIFEST.MF).
 
-## Eclipse
+## IntelliJ IDEA
+1. No IntelliJ IDEA, vá para `File` -> `Project Structure`.
+2. Na janela que abrir, selecione `Modules` no lado esquerdo.
+3. Na aba `Dependencies`, clique no `+` e selecione `JARs or directories...`.
+4. Selecione o arquivo JAR do driver que está na pasta `libs` do seu projeto e clique em `OK`.
+5. Clique em `Apply` e depois em `OK`.
 
+## Eclipse
 1. Clique com o botão direito no projeto no "Project Explorer".
 2. Selecione `Build Path` -> `Configure Build Path`.
 3. Na janela que abrir, vá para a aba `Libraries`.
@@ -100,16 +131,7 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
 5. Selecione o arquivo JAR do driver que está na pasta `libs` do seu projeto e clique em `Open` ou `OK`.
 6. Clique em `Apply and Close` para aplicar as alterações.
 
-## IntelliJ IDEA
-
-1. No IntelliJ IDEA, vá para `File` -> `Project Structure`.
-2. Na janela que abrir, selecione `Modules` no lado esquerdo.
-3. Na aba `Dependencies`, clique no `+` e selecione `JARs or directories...`.
-4. Selecione o arquivo JAR do driver que está na pasta `libs` do seu projeto e clique em `OK`.
-5. Clique em `Apply` e depois em `OK`.
-
 ## NetBeans
-
 1. Clique com o botão direito no seu projeto na janela `Projects`.
 2. Selecione `Properties`.
 3. Na janela que abrir, vá para `Libraries`.
@@ -117,7 +139,6 @@ Para criar o banco de dados "ShelfManager" no pgAdmin, siga os passos abaixo:
 5. Selecione o arquivo JAR do driver que está na pasta `libs` do seu projeto e clique em `Add JAR/Folder`.
 6. Clique em `OK`.
 
-### Testando a Conexão
-
-Após criar o banco de dados, adicionar o arquivo JAR do driver e configurar o classpath corretamente na sua IDE, você pode executar o arquivo `TesteConexao.java` para verificar se a conexão com o banco de dados está funcionando.
+## Testando a Conexão
+Após criar o banco de dados, importar o projeto, adicionar o arquivo JAR do driver e configurar o classpath corretamente na sua IDE, você pode executar o arquivo `TesteConexao.java` para verificar se a conexão com o banco de dados está funcionando.
 
