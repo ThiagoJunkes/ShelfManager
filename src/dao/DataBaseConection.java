@@ -38,7 +38,7 @@ public class DataBaseConection {
                 connection.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
     }
 }

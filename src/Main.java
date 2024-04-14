@@ -49,6 +49,7 @@ public class Main {
                     break;
                 case "0":
                     System.out.println("Saindo...");
+                    banco.closeConnection();
                     break;
                 default:
                     System.out.println("Opção inválida!");
@@ -892,7 +893,7 @@ public class Main {
                         System.out.println("Valor Inválido!");
                     }
                 }
-                Venda.adicionarItemVenda(banco, codCliente, metodoPag, precoTotal, livrosVendidos);
+                Venda.adicionarItemVenda(banco, codCliente, metodoPag, 4, livrosVendidos);
                 break;
             case "2":
                 break;
