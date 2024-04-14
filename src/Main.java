@@ -827,10 +827,12 @@ public class Main {
                 }
                 boolean livroValido = false;
                 int codLivro = 0;
+                float precoTotal = 0;
                 List<String> livrosVendidos = new ArrayList<>();
 
                 while(true){
                     try {
+                        Livro escolha = new Livro();
                         if(!livrosVendidos.isEmpty()) System.out.println("Digite -1 para não adicionar mais livros.");
                         System.out.println("Digite 0 para voltar ao Menu Inicial.");
                         System.out.print("Digite o código do livro vendido: ");
@@ -845,9 +847,10 @@ public class Main {
                         }
 
                         livroValido = false;
-                        for (Cliente cliente: clientes) {
-                            if (cliente.getCodCliente() == codLivro) {
+                        for (Livro livro: livros) {
+                            if (livro.getCodLivro() == codLivro) {
                                 livroValido = true;
+                                escolha = livro;
                                 break;
                             }
                         }
@@ -864,6 +867,7 @@ public class Main {
                                     System.out.println("Valor Inválido!");
                                 }
                             }
+                            precoTotal += (qtdLivro * escolha.getPreco());
                             livrosVendidos.add(codLivro + "|" + qtdLivro);
                         }
                     } catch (Exception e){
@@ -888,7 +892,7 @@ public class Main {
                         System.out.println("Valor Inválido!");
                     }
                 }
-                Venda.adicionarItemVenda(banco, codCliente, metodoPag, livrosVendidos);
+                Venda.adicionarItemVenda(banco, codCliente, metodoPag, precoTotal, livrosVendidos);
                 break;
             case "2":
                 break;

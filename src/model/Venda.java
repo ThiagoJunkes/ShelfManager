@@ -3,6 +3,7 @@ package model;
 import dao.DataBaseConection;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -92,9 +93,50 @@ public class Venda {
         return  vendas;
     }
 
-    public static void adicionarItemVenda(DataBaseConection banco, int codCliente, int metodoPag, List<String> livros){
-        for (String livroVenda : livros) {
-            System.out.println( codCliente + " | " + metodoPag + " | " + livroVenda);
+    public static void adicionarItemVenda(DataBaseConection banco, int codCliente, int metodoPag, float precoTotal, List<String> livros){
+
+        String sqlVendas = "INSERT INTO vendas (valor_venda, metodo_pag, cod_cliente)  VALUES (?, ?, ?)";
+        String sqlItensVendas = "INSERT INTO itens_vendas (cod_pedido, cod_livro, qtd_livros) VALUES ";
+        boolean first = true;
+        for (String vendas: livros) {
+            String[] itens = vendas.split("\\|");
+            if(first) sqlItensVendas += "(?, "+ itens[0] + ", " + itens[1] + ")";
+            else      sqlItensVendas += ", (?, "+ itens[0] + ", " + itens[1] + ")";
+            first = false;
+        }
+        System.out.println(sqlItensVendas);
+        try {
+
+            PreparedStatement statementVendas = banco.connection.prepareStatement(sqlVendas, PreparedStatement.RETURN_GENERATED_KEYS);
+            statementVendas.setFloat(1, precoTotal);
+            statementVendas.setString(2, Venda.metodosPagamento[metodoPag-1]);
+            statementVendas.setInt(3, codCliente);
+
+            int rowsInsertedVenda = statementVendas.executeUpdate();
+
+            // Obtendo o código da venda inserida
+            ResultSet generatedKeys = statementVendas.getGeneratedKeys();
+            int codVendaInserido = -1;
+            if (generatedKeys.next()) {
+                codVendaInserido = generatedKeys.getInt(1);
+            }
+
+            if (rowsInsertedVenda > 0 && codVendaInserido != -1) {
+                // Inserindo a quantidade em estoque na tabela estoque
+                PreparedStatement statementEstoque = banco.connection.prepareStatement(sqlItensVendas);
+                for (int i = 1; i <= livros.size(); i++){
+                    statementEstoque.setInt(i,codVendaInserido);
+                }
+
+
+                int rowsInsertedItensVendas= statementEstoque.executeUpdate();
+
+                if (rowsInsertedItensVendas > 0) {
+                    System.out.println("Venda registrada com sucesso!");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Não foi possivel registrar a venda!");
         }
     }
 }
