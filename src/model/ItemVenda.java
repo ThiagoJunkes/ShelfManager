@@ -94,9 +94,10 @@ public class ItemVenda {
 
         }catch (SQLException e) {
             System.out.println("Erro ao buscar vendas!");
-            System.out.println(e.getMessage());
         }
 
         return itensVendas;
     }
+
+
 }

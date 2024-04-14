@@ -7,7 +7,7 @@ public class DataBaseConection {
     private String port = "5432"; // porta padrão do PostgreSQL
     private String databaseName = "ShelfManager"; // nome do banco de dados
     private String username = "postgres"; // nome de usuário do PostgreSQL
-    private String password = "batata"; // senha do PostgreSQL
+    private String password = "admin"; // senha do PostgreSQL
 
     private String connectionString = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName + "?user=" + username + "&password=" + password;
 
@@ -24,8 +24,7 @@ public class DataBaseConection {
         // Criar uma declaração
         statement = connection.createStatement();
         }catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("O sistema não irá funcionar corretamente! Verifique sua conexão com o Banco de Dados.");
+            System.out.println("Verifique sua conexão com o Banco de Dados. O sistema não irá funcionar corretamente! ");
         }
     }
 

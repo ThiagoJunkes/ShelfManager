@@ -4,6 +4,7 @@ import view.Menu;
 
 import java.text.SimpleDateFormat;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import controller.Relatorio;
@@ -788,6 +789,7 @@ public class Main {
         switch (escolhaVenda) {
             case "1":
                 List<Cliente> clientes = Cliente.buscarClientes(banco);
+                System.out.println("-------------------------------------------------------------------");
                 System.out.println("Código| Nome                 | Sobrenome            | CPF");
                 for (Cliente cliente: clientes) {
                     cliente.printClienteFormatado();
@@ -795,9 +797,9 @@ public class Main {
                 boolean clienteValido = false;
                 int codCliente = 0;
 
-                do{
+                while (!clienteValido){
                     try {
-                        System.out.println("Digite 0 para voltar ao Menu Inicial ou ");
+                        System.out.println("Digite 0 para voltar ao Menu Inicial.");
                         System.out.print("Digite o código do cliente que realizou a compra: ");
                         codCliente = Integer.parseInt(scanner.nextLine());
 
@@ -814,11 +816,79 @@ public class Main {
                     } catch (Exception e){
                         System.out.println("Código Inválido!");
                     }
-                } while (!clienteValido);
+                };
                 if(!clienteValido) break;
 
-                //Selecione 0 para nao adicionar mais livros
+                List<Livro> livros = Livro.buscarLivros(banco);
+                System.out.println("-------------------------------------------------------------------");
+                System.out.println("Código| Título               | Editora              | ISBN");
+                for (Livro livro: livros) {
+                    livro.printLivroFormatado();
+                }
+                boolean livroValido = false;
+                int codLivro = 0;
+                List<String> livrosVendidos = new ArrayList<>();
 
+                while(true){
+                    try {
+                        if(!livrosVendidos.isEmpty()) System.out.println("Digite -1 para não adicionar mais livros.");
+                        System.out.println("Digite 0 para voltar ao Menu Inicial.");
+                        System.out.print("Digite o código do livro vendido: ");
+                        codLivro = Integer.parseInt(scanner.nextLine());
+
+                        if(codLivro == 0){ // Volta ao Menu Inicial
+                            livroValido = false;
+                            break;
+                        }
+                        if(!livrosVendidos.isEmpty() && codLivro == -1){ // Adiciona livros
+                            break;
+                        }
+
+                        livroValido = false;
+                        for (Cliente cliente: clientes) {
+                            if (cliente.getCodCliente() == codLivro) {
+                                livroValido = true;
+                                break;
+                            }
+                        }
+
+                        if(!livroValido) System.out.println("Código Inválido!");
+                        else{
+                            int qtdLivro = 0;
+                            while(qtdLivro < 1){
+                                try{
+                                    System.out.print("Digite a quantidade de livros: ");
+                                    qtdLivro = Integer.parseInt(scanner.nextLine());
+                                }
+                                catch (Exception e){
+                                    System.out.println("Valor Inválido!");
+                                }
+                            }
+                            livrosVendidos.add(codLivro + "|" + qtdLivro);
+                        }
+                    } catch (Exception e){
+                        System.out.println("Código Inválido!");
+                    }
+                }
+                if(!livroValido || livrosVendidos.isEmpty()) break;
+
+                int metodoPag = 0;
+                while(metodoPag < 1){
+                    try{
+                        System.out.println("Metodos de Pagamento: ");
+                        int i = 1;
+                        for (String pagamento: Venda.metodosPagamento) {
+                            System.out.println(i + " | " + pagamento);
+                            i++;
+                        }
+                        System.out.print("Selecione o método de pagamento: ");
+                        metodoPag = Integer.parseInt(scanner.nextLine());
+                        if(metodoPag > 5) metodoPag = 0;
+                    } catch (Exception e){
+                        System.out.println("Valor Inválido!");
+                    }
+                }
+                Venda.adicionarItemVenda(banco, codCliente, metodoPag, livrosVendidos);
                 break;
             case "2":
                 break;

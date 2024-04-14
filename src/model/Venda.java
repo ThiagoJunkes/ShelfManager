@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Venda {
@@ -14,6 +15,14 @@ public class Venda {
     private Date dataVenda;
     private String metodoPag;
     private int codCliente;
+
+    public static String[] metodosPagamento = {
+        "Cartão de Crédito",
+        "Cartão de Débito",
+        "Boleto Bancário",
+        "Dinheiro",
+        "Pix"
+    };
 
     // Getters e Setters
     public int getCodVenda() {
@@ -81,6 +90,12 @@ public class Venda {
         }
 
         return  vendas;
+    }
+
+    public static void adicionarItemVenda(DataBaseConection banco, int codCliente, int metodoPag, List<String> livros){
+        for (String livroVenda : livros) {
+            System.out.println( codCliente + " | " + metodoPag + " | " + livroVenda);
+        }
     }
 }
 
