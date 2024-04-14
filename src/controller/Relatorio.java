@@ -13,23 +13,30 @@ import java.util.Scanner;
 
 public class Relatorio {
 
-    private static String path_destino;
+    private static String path_destino = "";
 
     private static void escolherPastaDestino() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Digite o caminho da pasta de destino para os relatórios: ");
-        path_destino = scanner.nextLine();
-        if(!path_destino.endsWith("\\")) path_destino += "\\";
+
+        do{
+            System.out.print("Digite o caminho da pasta de destino para os relatórios: ");
+            path_destino = scanner.nextLine();
+            if(!path_destino.endsWith("\\")) path_destino += "\\";
+        } while (!verificarPastaDestino());
+
         System.out.println("Pasta de destino definida para: " + path_destino);
     }
 
     private static boolean verificarPastaDestino() {
         File directory = new File(path_destino);
-        return directory.exists();
+        if(directory.exists()) return true;
+
+        exibirMensagemErro();
+        return false;
     }
 
     private static void exibirMensagemErro() {
-        System.err.println("A pasta de destino não existe. Por favor, defina um novo caminho.");
+        System.out.println("A pasta de destino não existe. Por favor, defina um novo caminho.");
     }
 
     private static void exibirMenu() {
@@ -158,12 +165,7 @@ public class Relatorio {
 
     public static void main(String[] args) {
 
-        escolherPastaDestino();
-
-        while (!verificarPastaDestino()) {
-            exibirMensagemErro();
-            escolherPastaDestino();
-        }
+        if(path_destino.isEmpty()) escolherPastaDestino();
 
         Connection conn = null;
         try {
