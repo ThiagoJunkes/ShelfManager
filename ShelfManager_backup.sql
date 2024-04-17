@@ -1,171 +1,465 @@
-CREATE TABLE enderecos (
-    cod_endereco SERIAL PRIMARY KEY,
-    rua VARCHAR(100),
-    cidade VARCHAR(100),
-    estado VARCHAR(100),
-    cep INT,
-    complemento VARCHAR(100)
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 16.2 (Ubuntu 16.2-1.pgdg22.04+1)
+-- Dumped by pg_dump version 16.2 (Ubuntu 16.2-1.pgdg22.04+1)
+
+-- Started on 2024-04-17 19:10:39 -03
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3420 (class 1262 OID 16388)
+-- Name: ShelfManager; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE "ShelfManager" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.UTF-8';
+
+
+ALTER DATABASE "ShelfManager" OWNER TO postgres;
+
+\connect "ShelfManager"
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 222 (class 1259 OID 24663)
+-- Name: clientes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.clientes (
+    cod_cliente integer NOT NULL,
+    nome character varying(50) NOT NULL,
+    sobrenome character varying(250) NOT NULL,
+    cpf bigint NOT NULL,
+    email_cliente character varying(100),
+    telefone_cliente character varying(15),
+    data_cadastro date DEFAULT CURRENT_DATE,
+    cod_endereco integer
 );
 
-CREATE TABLE editoras (
-    cod_editora SERIAL PRIMARY KEY,
-    nome_editora VARCHAR(250),
-    nome_contato VARCHAR(250),
-    email_editora VARCHAR(250) UNIQUE,
-    telefone_editora VARCHAR(15)
+
+ALTER TABLE public.clientes OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 24662)
+-- Name: clientes_cod_cliente_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.clientes_cod_cliente_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.clientes_cod_cliente_seq OWNER TO postgres;
+
+--
+-- TOC entry 3421 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: clientes_cod_cliente_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.clientes_cod_cliente_seq OWNED BY public.clientes.cod_cliente;
+
+
+--
+-- TOC entry 218 (class 1259 OID 24638)
+-- Name: editoras; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.editoras (
+    cod_editora integer NOT NULL,
+    nome_editora character varying(250),
+    nome_contato character varying(250),
+    email_editora character varying(250),
+    telefone_editora character varying(15)
 );
 
-CREATE TABLE livros (
-    cod_livro SERIAL PRIMARY KEY,
-    titulo VARCHAR(250),
-    genero VARCHAR(100),
-    autor VARCHAR(250),
-    isbn BIGINT,
-    ano_publicacao DATE,
-    preco REAL,
-    cod_editora INT,
-    FOREIGN KEY (cod_editora) REFERENCES editoras(cod_editora)
+
+ALTER TABLE public.editoras OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 24637)
+-- Name: editoras_cod_editora_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.editoras_cod_editora_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.editoras_cod_editora_seq OWNER TO postgres;
+
+--
+-- TOC entry 3422 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: editoras_cod_editora_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.editoras_cod_editora_seq OWNED BY public.editoras.cod_editora;
+
+
+--
+-- TOC entry 216 (class 1259 OID 24631)
+-- Name: enderecos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.enderecos (
+    cod_endereco integer NOT NULL,
+    rua character varying(100),
+    cidade character varying(100),
+    estado character varying(100),
+    cep integer,
+    complemento character varying(100)
 );
 
-CREATE TABLE clientes (
-    cod_cliente SERIAL PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL,
-    sobrenome VARCHAR(250) NOT NULL,
-		cpf BIGINT NOT NULL,
-    email_cliente VARCHAR(100) UNIQUE,
-    telefone_cliente VARCHAR(15),
-    data_cadastro DATE DEFAULT CURRENT_DATE,
-    cod_endereco INT,
-    FOREIGN KEY (cod_endereco) REFERENCES enderecos(cod_endereco)
+
+ALTER TABLE public.enderecos OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 24630)
+-- Name: enderecos_cod_endereco_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.enderecos_cod_endereco_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.enderecos_cod_endereco_seq OWNER TO postgres;
+
+--
+-- TOC entry 3423 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: enderecos_cod_endereco_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.enderecos_cod_endereco_seq OWNED BY public.enderecos.cod_endereco;
+
+
+--
+-- TOC entry 225 (class 1259 OID 24690)
+-- Name: estoque; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.estoque (
+    cod_livro integer NOT NULL,
+    qtd_estoque integer
 );
 
-CREATE TABLE vendas (
-    cod_venda SERIAL PRIMARY KEY,
-    valor_venda REAL,
-    data_venda DATE DEFAULT CURRENT_DATE,
-    metodo_pag VARCHAR(50),
-    cod_cliente INT,
-    FOREIGN KEY (cod_cliente) REFERENCES clientes(cod_cliente)
+
+ALTER TABLE public.estoque OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 24698)
+-- Name: itens_vendas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.itens_vendas (
+    cod_pedido integer NOT NULL,
+    cod_livro integer NOT NULL,
+    qtd_livros integer
 );
 
-CREATE TABLE estoque (
-    cod_livro INT NOT NULL,
-    qtd_estoque INT,
-    FOREIGN KEY (cod_livro) REFERENCES livros(cod_livro)
+
+ALTER TABLE public.itens_vendas OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 24649)
+-- Name: livros; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.livros (
+    cod_livro integer NOT NULL,
+    titulo character varying(250),
+    genero character varying(100),
+    autor character varying(250),
+    isbn bigint,
+    ano_publicacao date,
+    preco real,
+    cod_editora integer
 );
 
-CREATE TABLE itens_vendas (
-    cod_pedido INT NOT NULL,
-    cod_livro INT NOT NULL,
-    qtd_livros INT,
-    PRIMARY KEY (cod_pedido, cod_livro),
-    FOREIGN KEY (cod_pedido) REFERENCES vendas(cod_venda),
-    FOREIGN KEY (cod_livro) REFERENCES livros(cod_livro)
+
+ALTER TABLE public.livros OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 24648)
+-- Name: livros_cod_livro_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.livros_cod_livro_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.livros_cod_livro_seq OWNER TO postgres;
+
+--
+-- TOC entry 3424 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: livros_cod_livro_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.livros_cod_livro_seq OWNED BY public.livros.cod_livro;
+
+
+--
+-- TOC entry 224 (class 1259 OID 24678)
+-- Name: vendas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.vendas (
+    cod_venda integer NOT NULL,
+    valor_venda real,
+    data_venda date DEFAULT CURRENT_DATE,
+    metodo_pag character varying(50),
+    cod_cliente integer
 );
 
--- Trigger
-CREATE OR REPLACE FUNCTION atualizar_estoque()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Diminui a quantidade de livros vendidos do estoque
-    UPDATE estoque
-    SET qtd_estoque = qtd_estoque - NEW.qtd_livros
-    WHERE cod_livro = NEW.cod_livro;
 
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+ALTER TABLE public.vendas OWNER TO postgres;
 
--- Associa a trigger a tabela de itens_vendas
-CREATE TRIGGER atualizar_estoque_trigger
-AFTER INSERT ON itens_vendas
-FOR EACH ROW
-EXECUTE FUNCTION atualizar_estoque();
+--
+-- TOC entry 223 (class 1259 OID 24677)
+-- Name: vendas_cod_venda_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.vendas_cod_venda_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
-------------------------------------------------------------------------------
+ALTER SEQUENCE public.vendas_cod_venda_seq OWNER TO postgres;
+
+--
+-- TOC entry 3425 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: vendas_cod_venda_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.vendas_cod_venda_seq OWNED BY public.vendas.cod_venda;
 
 
-INSERT INTO editoras (nome_editora, nome_contato, email_editora, telefone_editora)
-VALUES
-    ('Editora Estelar', 'Marcos Oliveira', 'contato@editoraestelar.com', '(11) 98765-4321'),
-    ('Mundo dos Livros', 'Amanda Santos', 'contato@mundodoslivros.com', '(22) 12345-6789'),
-    ('Páginas Encantadas', 'Rafaela Lima', 'contato@paginasencantadas.com', '(33) 87654-3210'),
-    ('Terra Mágica', 'Felipe Almeida', 'contato@terramagica.com', '(44) 23456-7890');
+--
+-- TOC entry 3245 (class 2604 OID 24666)
+-- Name: clientes cod_cliente; Type: DEFAULT; Schema: public; Owner: postgres
+--
 
-INSERT INTO livros (titulo, genero, autor, isbn, ano_publicacao, preco, cod_editora)
-VALUES
-    ('Aventuras em Marte', 'Ficção Científica', 'João Silva', 9781234567890, '2022-05-15', 29.99, 1),
-    ('O Segredo do Abismo', 'Suspense', 'Maria Santos', 9782345678901, '2020-10-20', 24.99, 2),
-    ('Caminho das Estrelas', 'Fantasia', 'Carlos Oliveira', 9783456789012, '2019-03-12', 19.99, 3),
-    ('A Arte da Guerra', 'Não Ficção', 'Ana Souza', 9784567890123, '2015-07-01', 14.99, 4),
-    ('Histórias do Além', 'Horror', 'Pedro Alves', 9785678901234, '2021-12-05', 34.99, 1);
-
-INSERT INTO enderecos (rua, cidade, estado, cep, complemento)
-VALUES
-    ('Rua das Flores', 'Cidade A', 'SC', 89217230, 'Apto 101'),
-    ('Avenida Central', 'Cidade B', 'SC', 89217230, 'Casa 20'),
-    ('Rua Principal', 'Cidade C', 'SP', 89217230, 'Bloco B'),
-    ('Travessa das Palmeiras', 'Cidade D', 'SP', 89217230, 'Sala 05'),
-    ('Alameda dos Ipês', 'Cidade E', 'RJ', 89217230, 'Casa 15'),
-    ('Avenida das Águias', 'Cidade F', 'RJ', 89217230, 'Apartamento 301'),
-    ('Praça da Liberdade', 'Cidade G', 'RG', 89217230, 'Bloco C, 2º Andar'),
-    ('Rua dos Girassóis', 'Cidade H', 'RG', 89217230, 'Casa 30'),
-    ('Avenida dos Pinheiros', 'Cidade I', 'BA', 89217230, 'Loja 02'),
-    ('Rodovia do Sol', 'Cidade J', 'AM', 89217230, 'Galpão 10');
+ALTER TABLE ONLY public.clientes ALTER COLUMN cod_cliente SET DEFAULT nextval('public.clientes_cod_cliente_seq'::regclass);
 
 
-INSERT INTO clientes (nome, sobrenome, cpf, email_cliente, telefone_cliente, cod_endereco)
-VALUES
-    ('Ana', 'Silva', 12345678901, 'ana.silva@email.com', '(11) 98765-4321', 1),
-    ('Pedro', 'Oliveira', 23456789012, 'pedro.oliveira@email.com', '(22) 12345-6789', 2),
-    ('Carla', 'Santos', 34567890123, 'carla.santos@email.com', '(33) 87654-3210', 3),
-    ('José', 'Lima', 45678901234, 'jose.lima@email.com', '(44) 23456-7890', 4),
-    ('Mariana', 'Almeida', 56789012345, 'mariana.almeida@email.com', '(55) 11111-1111', 5),
-    ('Rafael', 'Pereira', 67890123456, 'rafael.pereira@email.com', '(66) 22222-2222', 6),
-    ('Amanda', 'Martins', 78901234567, 'amanda.martins@email.com', '(77) 33333-3333', 7),
-    ('Luiz', 'Gomes', 89012345678, 'luiz.gomes@email.com', '(88) 44444-4444', 8),
-    ('Fernanda', 'Rodrigues', 90123456789, 'fernanda.rodrigues@email.com', '(99) 55555-5555', 9),
-    ('Gustavo', 'Ferreira', 12345678910, 'gustavo.ferreira@email.com', '(00) 66666-6666', 10);
+--
+-- TOC entry 3243 (class 2604 OID 24641)
+-- Name: editoras cod_editora; Type: DEFAULT; Schema: public; Owner: postgres
+--
 
--- Estoque Inicial de todos os livros para 10 unidades
-INSERT INTO estoque (cod_livro, qtd_estoque)
-SELECT cod_livro, 10
-FROM livros;
+ALTER TABLE ONLY public.editoras ALTER COLUMN cod_editora SET DEFAULT nextval('public.editoras_cod_editora_seq'::regclass);
 
--- Registra as vendas
-INSERT INTO vendas (valor_venda, metodo_pag, cod_cliente)
-VALUES (54.98, 'Cartão de Crédito', 1);
 
-INSERT INTO itens_vendas (cod_pedido, cod_livro, qtd_livros)
-VALUES (1, 1, 1), -- Aventuras em Marte
-       (1, 2, 1); -- O Segredo do Abismo
+--
+-- TOC entry 3242 (class 2604 OID 24634)
+-- Name: enderecos cod_endereco; Type: DEFAULT; Schema: public; Owner: postgres
+--
 
-INSERT INTO vendas (valor_venda, metodo_pag, cod_cliente)
-VALUES (34.98, 'Boleto Bancário', 2);
+ALTER TABLE ONLY public.enderecos ALTER COLUMN cod_endereco SET DEFAULT nextval('public.enderecos_cod_endereco_seq'::regclass);
 
-INSERT INTO itens_vendas (cod_pedido, cod_livro, qtd_livros)
-VALUES (2, 3, 1), -- Caminho das Estrelas
-       (2, 4, 1); -- A Arte da Guerra
 
-INSERT INTO vendas (valor_venda, metodo_pag, cod_cliente)
-VALUES (64.98, 'Boleto Bancário', 3);
+--
+-- TOC entry 3244 (class 2604 OID 24652)
+-- Name: livros cod_livro; Type: DEFAULT; Schema: public; Owner: postgres
+--
 
-INSERT INTO itens_vendas (cod_pedido, cod_livro, qtd_livros)
-VALUES (3, 5, 1), -- Histórias do Além
-       (3, 1, 1); -- Aventuras em Marte
+ALTER TABLE ONLY public.livros ALTER COLUMN cod_livro SET DEFAULT nextval('public.livros_cod_livro_seq'::regclass);
 
-INSERT INTO vendas (valor_venda, metodo_pag, cod_cliente)
-VALUES (39.98, 'Pix', 4);
 
-INSERT INTO itens_vendas (cod_pedido, cod_livro, qtd_livros)
-VALUES (4, 4, 1), -- A Arte da Guerra
-       (4, 2, 1); -- O Segredo do Abismo
+--
+-- TOC entry 3247 (class 2604 OID 24681)
+-- Name: vendas cod_venda; Type: DEFAULT; Schema: public; Owner: postgres
+--
 
-INSERT INTO vendas (valor_venda, metodo_pag, cod_cliente)
-VALUES (69.97, 'Dinheiro', 5);
+ALTER TABLE ONLY public.vendas ALTER COLUMN cod_venda SET DEFAULT nextval('public.vendas_cod_venda_seq'::regclass);
 
-INSERT INTO itens_vendas (cod_pedido, cod_livro, qtd_livros)
-VALUES (5, 3, 1), -- Caminho das Estrelas
-       (5, 5, 1), -- Histórias do Além
-       (5, 4, 1); -- A Arte da Guerra
+
+--
+-- TOC entry 3258 (class 2606 OID 24671)
+-- Name: clientes clientes_email_cliente_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.clientes
+    ADD CONSTRAINT clientes_email_cliente_key UNIQUE (email_cliente);
+
+
+--
+-- TOC entry 3260 (class 2606 OID 24669)
+-- Name: clientes clientes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.clientes
+    ADD CONSTRAINT clientes_pkey PRIMARY KEY (cod_cliente);
+
+
+--
+-- TOC entry 3252 (class 2606 OID 24647)
+-- Name: editoras editoras_email_editora_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.editoras
+    ADD CONSTRAINT editoras_email_editora_key UNIQUE (email_editora);
+
+
+--
+-- TOC entry 3254 (class 2606 OID 24645)
+-- Name: editoras editoras_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.editoras
+    ADD CONSTRAINT editoras_pkey PRIMARY KEY (cod_editora);
+
+
+--
+-- TOC entry 3250 (class 2606 OID 24636)
+-- Name: enderecos enderecos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.enderecos
+    ADD CONSTRAINT enderecos_pkey PRIMARY KEY (cod_endereco);
+
+
+--
+-- TOC entry 3264 (class 2606 OID 24702)
+-- Name: itens_vendas itens_vendas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.itens_vendas
+    ADD CONSTRAINT itens_vendas_pkey PRIMARY KEY (cod_pedido, cod_livro);
+
+
+--
+-- TOC entry 3256 (class 2606 OID 24656)
+-- Name: livros livros_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.livros
+    ADD CONSTRAINT livros_pkey PRIMARY KEY (cod_livro);
+
+
+--
+-- TOC entry 3262 (class 2606 OID 24684)
+-- Name: vendas vendas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vendas
+    ADD CONSTRAINT vendas_pkey PRIMARY KEY (cod_venda);
+
+
+--
+-- TOC entry 3271 (class 2620 OID 24714)
+-- Name: itens_vendas atualizar_estoque_trigger; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER atualizar_estoque_trigger AFTER INSERT ON public.itens_vendas FOR EACH ROW EXECUTE FUNCTION public.atualizar_estoque();
+
+
+--
+-- TOC entry 3266 (class 2606 OID 24672)
+-- Name: clientes clientes_cod_endereco_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.clientes
+    ADD CONSTRAINT clientes_cod_endereco_fkey FOREIGN KEY (cod_endereco) REFERENCES public.enderecos(cod_endereco);
+
+
+--
+-- TOC entry 3268 (class 2606 OID 24693)
+-- Name: estoque estoque_cod_livro_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estoque
+    ADD CONSTRAINT estoque_cod_livro_fkey FOREIGN KEY (cod_livro) REFERENCES public.livros(cod_livro);
+
+
+--
+-- TOC entry 3269 (class 2606 OID 24708)
+-- Name: itens_vendas itens_vendas_cod_livro_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.itens_vendas
+    ADD CONSTRAINT itens_vendas_cod_livro_fkey FOREIGN KEY (cod_livro) REFERENCES public.livros(cod_livro);
+
+
+--
+-- TOC entry 3270 (class 2606 OID 24703)
+-- Name: itens_vendas itens_vendas_cod_pedido_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.itens_vendas
+    ADD CONSTRAINT itens_vendas_cod_pedido_fkey FOREIGN KEY (cod_pedido) REFERENCES public.vendas(cod_venda);
+
+
+--
+-- TOC entry 3265 (class 2606 OID 24657)
+-- Name: livros livros_cod_editora_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.livros
+    ADD CONSTRAINT livros_cod_editora_fkey FOREIGN KEY (cod_editora) REFERENCES public.editoras(cod_editora);
+
+
+--
+-- TOC entry 3267 (class 2606 OID 24685)
+-- Name: vendas vendas_cod_cliente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vendas
+    ADD CONSTRAINT vendas_cod_cliente_fkey FOREIGN KEY (cod_cliente) REFERENCES public.clientes(cod_cliente);
+
+
+-- Completed on 2024-04-17 19:10:40 -03
+
+--
+-- PostgreSQL database dump complete
+--
