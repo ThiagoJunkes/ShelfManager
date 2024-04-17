@@ -147,6 +147,7 @@ Após criar o banco de dados, importar o projeto, adicionar o arquivo JAR do dri
 2. Na janela que abrir, selecione `Artifacts` no lado esquerdo.
 3. Clique em `+` e selecione `JAR` -> `From Modules with Dependencies...`.
 4. Selecione a Classe Main e clique em `OK`
+5. Volte para tela inicial do IntelliJ e na parte superior selecione `Build` -> `Build Artifacts...`
 
 Agora abra o prombt de comando e rode o seguinte codigo:
    ```shell
