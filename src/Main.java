@@ -84,14 +84,14 @@ public class Main {
                     System.out.print("Sobrenome: ");
                     novoCliente.setSobrenome(scanner.nextLine());
 
-                    System.out.print("CPF: ");
-                    long cpf = Long.parseLong(scanner.nextLine());
-                    while (String.valueOf(cpf).length() != 11) {
+                    System.out.print("CPF (somente digito): ");
+                    String cpf = scanner.nextLine().trim();
+                    while (!cpf.matches("^\\d{11}$")) {
                         System.out.println("CPF inválido! Deve conter 11 dígitos.");
-                        System.out.print("CPF: ");
-                        cpf = Long.parseLong(scanner.nextLine());
+                        System.out.print("CPF (somente digito): ");
+                        scanner.nextLine().trim();
                     }
-                    novoCliente.setCpf(Long.parseLong(scanner.nextLine()));
+                    novoCliente.setCpf(Long.parseLong(cpf));
 
                     System.out.print("Email: ");
                     String email = scanner.nextLine();
