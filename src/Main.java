@@ -923,7 +923,7 @@ public class Main {
                                 if(escolha == venda.getCodPedido() && escolhaLivro == venda.livro.getCodLivro()){
                                     venda.printItemVendaSemFormatacao();
                                     editarVenda = venda;
-                                    codLivroOriginal = escolha;
+                                    codLivroOriginal = escolhaLivro;
                                     break;
                                 }
                             }

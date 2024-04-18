@@ -124,38 +124,60 @@ public class ItemVenda {
         return itensVendas;
     }
 
-    public static void editarItemVenda(DataBaseConection banco, ItemVenda venda, int codLivroOriginal){
-        try{
-            String sqlVendas = "UPDATE vendas SET metodo_pag = ?, cod_cliente = ?, data_venda = ? "+
-                               "WHERE cod_venda = ?";
+    public static void editarItemVenda(DataBaseConection banco, ItemVenda venda, int codLivroOriginal) {
+        try {
+            String sqlVendas = "UPDATE vendas SET metodo_pag = ?, cod_cliente = ?, data_venda = ? " +
+                    "WHERE cod_venda = ?";
 
             String sqlItemVenda = "UPDATE itens_vendas SET cod_livro = ?, qtd_livros = ? " +
-                                  "WHERE cod_livro = ? AND cod_pedido = ?";
+                    "WHERE cod_livro = ? AND cod_pedido = ?";
 
+            String sqlUpdateValorTotal = "UPDATE vendas SET valor_venda = ? WHERE cod_venda = ?";
+
+            // Atualiza os dados da venda na tabela vendas
             banco.preparedStatement = banco.connection.prepareStatement(sqlVendas);
-
             banco.preparedStatement.setString(1, venda.venda.getMetodoPag());
             banco.preparedStatement.setInt(2, venda.cliente.getCodCliente());
             banco.preparedStatement.setDate(3, venda.venda.getDataVenda());
             banco.preparedStatement.setInt(4, venda.getCodPedido());
-
             banco.preparedStatement.executeUpdate();
 
-
+            // Atualiza os dados do item de venda na tabela itens_vendas
             banco.preparedStatement = banco.connection.prepareStatement(sqlItemVenda);
-
             banco.preparedStatement.setInt(1, venda.livro.getCodLivro());
             banco.preparedStatement.setInt(2, venda.getQtdLivros());
             banco.preparedStatement.setInt(3, codLivroOriginal);
             banco.preparedStatement.setInt(4, venda.getCodPedido());
-
             banco.preparedStatement.executeUpdate();
+
+            // Após atualizar os dados, calcula o novo valor total da venda
+            String sqlCalcValorTotal = "SELECT l.preco, iv.qtd_livros " +
+                    "FROM livros l " +
+                    "JOIN itens_vendas iv ON l.cod_livro = iv.cod_livro " +
+                    "WHERE iv.cod_pedido = ?";
+            banco.preparedStatement = banco.connection.prepareStatement(sqlCalcValorTotal);
+            banco.preparedStatement.setInt(1, venda.getCodPedido());
+            ResultSet resultSet = banco.preparedStatement.executeQuery();
+
+            double novoValorTotal = 0;
+            while (resultSet.next()) {
+                double valor = resultSet.getDouble(1) * resultSet.getDouble(2);
+                novoValorTotal += valor;
+            }
+
+            // Atualiza o valor_venda na tabela vendas
+            banco.preparedStatement = banco.connection.prepareStatement(sqlUpdateValorTotal);
+            banco.preparedStatement.setDouble(1, novoValorTotal);
+            banco.preparedStatement.setInt(2, venda.getCodPedido());
+            banco.preparedStatement.executeUpdate();
+
             System.out.println("Venda atualizada com sucesso!");
-        }
-        catch (Exception e){
-            System.out.println("Não foi possivel atualizar Venda!");
+
+        } catch (Exception e) {
+            System.out.println("Não foi possível atualizar Venda!");
         }
     }
+
 
     public static void excluirItemVenda(DataBaseConection banco, ItemVenda itemVenda) {
 
