@@ -149,8 +149,8 @@ Após criar o banco de dados, importar o projeto, adicionar o arquivo JAR do dri
 4. Selecione a Classe Main e clique em `OK`
 5. Volte para tela inicial do IntelliJ e na parte superior selecione `Build` -> `Build Artifacts...`
 
-Agora abra o prombt de comando e rode o seguinte codigo:
+Agora abra o prompt de comando e rode o seguinte codigo:
    ```shell
       java -cp "C:\Local\Arquivo\ShelfManager\out\artifacts\ShelfManager_jar\ShelfManager.jar" Main
 ```
-Alterando `C:\Local\Arquivo` para o local onde o projeto está localizado
+Alterando `C:\Local\Arquivo` para o local onde o projeto está localizado.
