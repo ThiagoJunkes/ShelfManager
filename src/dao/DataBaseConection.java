@@ -1,44 +1,45 @@
 package dao;
 
-import java.sql.*;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.Session;
 
 public class DataBaseConection {
-    private String host = "localhost"; // endereço IP do seu servidor PostgreSQL
-    private String port = "5432"; // porta padrão do PostgreSQL
-    private String databaseName = "ShelfManager"; // nome do banco de dados
-    private String username = "postgres"; // nome de usuário do PostgreSQL
-    private String password = "admin"; // senha do PostgreSQL
+    private final String uri = "bolt://localhost:7687";
+    private final String username = "neo4j";
+    private final String password = "12345678";
 
-    private String connectionString = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName + "?user=" + username + "&password=" + password;
+    private Driver driver;
+    private Session session;
 
-    public Connection connection = null;
-    public Statement statement = null;
-    public PreparedStatement preparedStatement;
-    public DataBaseConection(){
-        try{
-
-        // Estabelecer conexão
-        connection = DriverManager.getConnection(connectionString);
-        //System.out.println("Conexão com o Banco de Dados estabelecida com sucesso!");
-
-        // Criar uma declaração
-        statement = connection.createStatement();
-        }catch (SQLException e) {
-            System.out.println("Verifique sua conexão com o Banco de Dados. O sistema não irá funcionar corretamente! ");
+    public DataBaseConection() {
+        try {
+            // Estabelecer conexão
+            driver = GraphDatabase.driver(uri, AuthTokens.basic(username, password));
+            session = driver.session();
+            System.out.println("Conexão com o Neo4j estabelecida com sucesso!");
+        } catch (Exception e) {
+            System.out.println("Verifique sua conexão com o Neo4j. O sistema não irá funcionar corretamente!");
+            e.printStackTrace();
         }
     }
 
-    public void closeConnection(){
+    public void closeConnection() {
         // Fechar recursos
         try {
-            if (statement != null) {
-                statement.close();
+            if (session != null) {
+                session.close();
             }
-            if (connection != null) {
-                connection.close();
+            if (driver != null) {
+                driver.close();
             }
-        } catch (SQLException e) {
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    public Session getSession() {
+        return session;
     }
 }

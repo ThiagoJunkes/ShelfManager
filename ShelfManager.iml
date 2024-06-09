@@ -11,6 +11,7 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/libs/postgresql-42.7.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/neo4j-java-driver-4.4.9.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
