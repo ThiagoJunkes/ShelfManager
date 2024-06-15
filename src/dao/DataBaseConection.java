@@ -6,7 +6,7 @@ import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 
 public class DataBaseConection {
-    private final String uri = "bolt://localhost:7687";
+    private final String uri = "neo4j://localhost:7687";
     private final String username = "neo4j";
     private final String password = "12345678";
 
