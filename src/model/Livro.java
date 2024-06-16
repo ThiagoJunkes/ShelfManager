@@ -1,13 +1,13 @@
 package model;
 
 import dao.DataBaseConection;
+import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.types.Node;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Livro {
@@ -97,25 +97,35 @@ public class Livro {
         this.qtdEstoque = qtdEstoque;
     }
 
-    public void printLivroFormatado(){
-        String tituloFormatado = titulo;
-        tituloFormatado = tituloFormatado.length() > 20 ? tituloFormatado.substring(0, 20) : tituloFormatado;
-
-        String editoraFormatado = editora.getNomeEditora();
-        editoraFormatado = editoraFormatado.length() > 20 ? editoraFormatado.substring(0, 20) : editoraFormatado;
-
-        System.out.printf("%-5d | %-20s | %-20s | %-20s \n", // total 70 carac
-                codLivro,
-                tituloFormatado,
-                editoraFormatado,
-                isbn
-        );
+    public Livro() {
     }
-    public void printLivroSemFormatacao(){
+
+    public Livro(String titulo, String genero, String autor, long isbn, Date anoPublicacao, double preco, int quantidadeEstoque, Editora editora) {
+        this.titulo = titulo;
+        this.genero = genero;
+        this.autor = autor;
+        this.isbn = isbn;
+        this.anoPublicacao = anoPublicacao;
+        this.preco = preco;
+        this.qtdEstoque = quantidadeEstoque;
+        this.editora = editora;
+    }
+
+    // Getters e Setters omitidos para brevidade
+
+    public void printLivroFormatado() {
+        String tituloFormatado = titulo.length() > 20 ? titulo.substring(0, 20) : titulo;
+        String editoraFormatada = editora.getNomeEditora().length() > 20 ? editora.getNomeEditora().substring(0, 20) : editora.getNomeEditora();
+
+        System.out.printf("%-20s | %-20s | %-20s | %-20s\n",
+                tituloFormatado, genero, editoraFormatada, isbn);
+    }
+
+    public void printLivroSemFormatacao() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String dataFormatada = sdf.format(anoPublicacao);
 
-        System.out.println("Livro: " + codLivro);
+        System.out.println("Livro: " + titulo);
         System.out.println("0 - Para voltar ao Menu e alterar a Editora no Menu Editoras");
         System.out.println("1 - Título:            " + titulo);
         System.out.println("2 - Gênero:            " + genero);
@@ -126,152 +136,125 @@ public class Livro {
         System.out.println("7 - Editora:           " + editora.getCodEditora() + " | " + editora.getNomeEditora());
     }
 
-    public static List<Livro> buscarLivros(DataBaseConection banco){
+    public static List<Livro> buscarLivros(DataBaseConection banco) {
         List<Livro> livros = new ArrayList<>();
-        ResultSet resultSet = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        try{
-            String sql = "SELECT l.*, e.* FROM livros l JOIN editoras e ON e.cod_editora = l.cod_editora ORDER BY l.cod_livro";
-            resultSet = banco.statement.executeQuery(sql);
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (livro:Livro)-[:EDITORA]->(editora:Editora) RETURN livro, editora";
+            try (Transaction tx = session.beginTransaction()){
+                 Result result = tx.run(query);
 
-            while (resultSet.next()) {
-                Livro livro = new Livro();
-                Editora editora = new Editora();
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    Node livroNode = record.get("livro").asNode();
+                    Node editoraNode = record.get("editora").asNode();
 
-                livro.codLivro = resultSet.getInt("cod_livro");
-                livro.titulo = resultSet.getString("titulo");
-                livro.genero = resultSet.getString("genero");
-                livro.autor = resultSet.getString("autor");
-                livro.isbn = resultSet.getLong("isbn");
-                livro.anoPublicacao = resultSet.getDate("ano_publicacao");
-                livro.preco = resultSet.getDouble("preco");
-                livro.codEditora = resultSet.getInt("cod_Editora");
-                editora.setCodEditora(resultSet.getInt("cod_editora"));
-                editora.setNomeEditora(resultSet.getString("nome_editora"));
-                editora.setNomeContato(resultSet.getString("nome_contato"));
-                editora.setEmailEditora(resultSet.getString("email_editora"));
-                editora.setTelefoneEditora(resultSet.getString("telefone_editora"));
+                    Livro livro = new Livro();
+                    livro.setTitulo(livroNode.get("titulo").asString());
+                    livro.setGenero(livroNode.get("genero").asString());
+                    livro.setAutor(livroNode.get("autor").asString());
+                    livro.setIsbn(livroNode.get("isbn").asLong());
+                    livro.setAnoPublicacao(sdf.parse(livroNode.get("ano_publicacao").asString()));
+                    livro.setPreco(livroNode.get("preco").asDouble());
+                    livro.setQtdEstoque(livroNode.get("quantidade_estoque").asInt());
 
-                livro.editora = editora;
-                livros.add(livro);
+                    Editora editora = new Editora();
+                    editora.setNomeEditora(editoraNode.get("nome").asString());
+                    editora.setNomeContato(editoraNode.get("nome_contato").asString());
+                    editora.setEmailEditora(editoraNode.get("email").asString());
+                    editora.setTelefoneEditora(editoraNode.get("telefone").asString());
+
+                    livro.editora = editora;
+                    livros.add(livro);
+                }
             }
-
-        }catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar Livros: " + e.getMessage());
         }
 
-        return  livros;
+        return livros;
     }
 
     public static boolean adicionarLivro(Livro livro, DataBaseConection banco) {
-        String sqlLivro = "INSERT INTO livros (titulo, genero, autor, isbn, ano_publicacao, preco, cod_editora) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String sqlEstoque = "INSERT INTO estoque (cod_livro, qtd_estoque) VALUES (?, ?)";
+        try (Session session = banco.getSession()) {
+            String query = "CREATE (livro:Livro {titulo: '" + livro.getTitulo() + "', " +
+                    "genero: '" + livro.getGenero() + "', " +
+                    "autor: '" + livro.getAutor() + "', " +
+                    "isbn: " + livro.getIsbn() + ", " +
+                    "ano_publicacao: '" + livro.getAnoPublicacao().toString() + "', " +
+                    "preco: " + livro.getPreco() + ", " +
+                    "quantidade_estoque: " + livro.getQtdEstoque() + "})" +
+                    "-[:EDITORA]->(editora:Editora {nome: '" + livro.editora.getNomeEditora() + "', " +
+                    "nome_contato: '" + livro.editora.getNomeContato() + "', " +
+                    "email: '" + livro.editora.getEmailEditora() + "', " +
+                    "telefone: '" + livro.editora.getTelefoneEditora() + "'})";
 
-        try {
-            // Inserindo o livro na tabela livros
-            PreparedStatement statementLivro = banco.connection.prepareStatement(sqlLivro, PreparedStatement.RETURN_GENERATED_KEYS);
-            statementLivro.setString(1, livro.getTitulo());
-            statementLivro.setString(2, livro.getGenero());
-            statementLivro.setString(3, livro.getAutor());
-            statementLivro.setLong(4, livro.getIsbn());
-            statementLivro.setDate(5, livro.getAnoPublicacao());
-            statementLivro.setDouble(6, livro.getPreco());
-            statementLivro.setInt(7, livro.getCodEditora());
+            session.writeTransaction(tx -> {
+                tx.run(query);
+                return null;
+            });
 
-            int rowsInsertedLivro = statementLivro.executeUpdate();
-
-            // Obtendo o código do livro inserido
-            ResultSet generatedKeys = statementLivro.getGeneratedKeys();
-            int codLivroInserido = -1;
-            if (generatedKeys.next()) {
-                codLivroInserido = generatedKeys.getInt(1);
-            }
-
-            if (rowsInsertedLivro > 0 && codLivroInserido != -1) {
-                // Inserindo a quantidade em estoque na tabela estoque
-                PreparedStatement statementEstoque = banco.connection.prepareStatement(sqlEstoque);
-                statementEstoque.setInt(1, codLivroInserido);
-                statementEstoque.setInt(2, livro.getQtdEstoque());
-
-                int rowsInsertedEstoque = statementEstoque.executeUpdate();
-
-                if (rowsInsertedEstoque > 0) {
-                    return true;
-                }
-            }
-        } catch (SQLException e) {
+            return true;
+        } catch (Exception e) {
             return false;
         }
-        return false;
     }
 
-    public static boolean editarLivro(Livro livro, DataBaseConection banco) {
-        String sql = "UPDATE livros SET titulo=?, genero=?, autor=?, isbn=?, ano_publicacao=?, preco=?, cod_editora=? WHERE cod_livro=?";
-        try {
-            PreparedStatement statement = banco.connection.prepareStatement(sql);
-            statement.setString(1, livro.getTitulo());
-            statement.setString(2, livro.getGenero());
-            statement.setString(3, livro.getAutor());
-            statement.setLong(4, livro.getIsbn());
-            statement.setDate(5, livro.getAnoPublicacao());
-            statement.setDouble(6, livro.getPreco());
-            statement.setInt(7, livro.getCodEditora());
-            statement.setInt(8, livro.getCodLivro());
+    public static boolean editarLivro(Livro livroAtualizado, DataBaseConection banco) {
+        try (Session session = banco.getSession()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); // Formato para a data
 
-            int rowsUpdated = statement.executeUpdate();
-            if (rowsUpdated > 0) {
+            String query = "MATCH (livro:Livro {isbn: " + livroAtualizado.getIsbn() + "})-[:EDITORA]->(editora:Editora) " +
+                    "SET livro.titulo = '" + livroAtualizado.getTitulo() + "', " +
+                    "    livro.genero = '" + livroAtualizado.getGenero() + "', " +
+                    "    livro.autor = '" + livroAtualizado.getAutor() + "', " +
+                    "    livro.ano_publicacao = date('" + sdf.format(livroAtualizado.getAnoPublicacao()) + "'), " +
+                    "    livro.preco = " + livroAtualizado.getPreco() + ", " +
+                    "    livro.quantidade_estoque = " + livroAtualizado.getQtdEstoque() + ", " +
+                    "    editora.nome = '" + livroAtualizado.editora.getNomeEditora() + "', " +
+                    "    editora.nome_contato = '" + livroAtualizado.editora.getNomeContato() + "', " +
+                    "    editora.email = '" + livroAtualizado.editora.getEmailEditora() + "', " +
+                    "    editora.telefone = '" + livroAtualizado.editora.getTelefoneEditora() + "' " +
+                    "RETURN livro";
+
+            List<Record> result = session.writeTransaction(tx -> {
+                Result resultSet = tx.run(query);
+                return resultSet.list();
+            });
+
+            if (!result.isEmpty()) {
                 System.out.println("Livro atualizado com sucesso!");
                 return true;
-            }
-        } catch (SQLException e) {
-            return false;
-        }
-        return false;
-    }
-
-    public static boolean excluirLivro(Livro livro, DataBaseConection banco) {
-        String sqlVendas = "SELECT COUNT(*) AS total_vendas FROM itens_vendas WHERE cod_livro=?";
-        String sqlExcluirEstoque = "DELETE FROM estoque WHERE cod_livro=?";
-        String sqlExcluirLivro = "DELETE FROM livros WHERE cod_livro=?";
-
-        try {
-            // Verifica se há vendas relacionadas a este livro
-            PreparedStatement statementVendas = banco.connection.prepareStatement(sqlVendas);
-            statementVendas.setInt(1, livro.getCodLivro());
-            ResultSet rsVendas = statementVendas.executeQuery();
-
-            int totalVendas = 0;
-            if (rsVendas.next()) {
-                totalVendas = rsVendas.getInt("total_vendas");
-            }
-
-            if (totalVendas > 0) {
-                System.out.println("Não é possível excluir um livro pos ele já possui uma venda!");
+            } else {
+                System.out.println("Nenhum livro atualizado.");
                 return false;
             }
-
-            // Se não há vendas, exclui o livro do estoque
-            PreparedStatement statementExcluirEstoque = banco.connection.prepareStatement(sqlExcluirEstoque);
-            statementExcluirEstoque.setInt(1, livro.getCodLivro());
-            statementExcluirEstoque.executeUpdate();
-
-            // Exclui o livro da tabela livros
-            PreparedStatement statementExcluirLivro = banco.connection.prepareStatement(sqlExcluirLivro);
-            statementExcluirLivro.setInt(1, livro.getCodLivro());
-
-            int rowsDeleted = statementExcluirLivro.executeUpdate();
-            if (rowsDeleted > 0) {
-                System.out.println("Livro excluído com sucesso!");
-                return true;
-            }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Falha ao atualizar livro.");
             return false;
         }
-
-        return false;
     }
+
+
+    public static boolean excluirLivro(Livro livroExcluir, DataBaseConection banco) {
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (livro:Livro {isbn: " + livroExcluir.getIsbn() + "}) " +
+                    "OPTIONAL MATCH (livro)-[r:EDITORA]->() " +
+                    "DELETE livro, r";
+
+            session.writeTransaction(tx -> {
+                tx.run(query);
+                return null;
+            });
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 
 
 }
-

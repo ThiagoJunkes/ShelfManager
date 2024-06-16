@@ -1,10 +1,13 @@
 package model;
 
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.Values;
+import org.neo4j.driver.exceptions.ClientException;
+
 import dao.DataBaseConection;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +21,9 @@ public class ItemVenda {
     public Venda venda;
     public Cliente cliente;
 
-    // Getters e Setters
+    public ItemVenda() {
+    }
+
     public int getCodPedido() {
         return codPedido;
     }
@@ -43,7 +48,31 @@ public class ItemVenda {
         this.qtdLivros = qtdLivros;
     }
 
-    public void printItemVendaFormatado(){
+    public Livro getLivro() {
+        return livro;
+    }
+
+    public void setLivro(Livro livro) {
+        this.livro = livro;
+    }
+
+    public Venda getVenda() {
+        return venda;
+    }
+
+    public void setVenda(Venda venda) {
+        this.venda = venda;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public void printItemVendaFormatado() {
         System.out.println("-------------------------------------------------");
         System.out.println("Código Livro: " + codLivro);
         System.out.println("  Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
@@ -52,7 +81,7 @@ public class ItemVenda {
         System.out.println("  Cliente: " + cliente.getNome() + " " + cliente.getSobrenome() + " CPF: " + cliente.getCpf());
     }
 
-    public void printItemVendaSemFormatacao(){
+    public void printItemVendaSemFormatacao() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String dataFormatada = sdf.format(venda.getDataVenda());
 
@@ -66,142 +95,105 @@ public class ItemVenda {
         System.out.println("Cliente: " + cliente.getNome() + " " + cliente.getSobrenome() + " CPF: " + cliente.getCpf());
     }
 
-    public static List<ItemVenda> buscarItensVenda(DataBaseConection banco){
+    public static List<ItemVenda> buscarItensVenda(DataBaseConection banco) {
         List<ItemVenda> itensVendas = new ArrayList<>();
-        ResultSet resultSet = null;
 
-        try{
-            String sql = "SELECT * FROM itens_vendas iv " +
-                         "JOIN vendas v ON iv.cod_pedido = v.cod_venda " +
-                         "JOIN livros l ON iv.cod_livro = l.cod_livro JOIN clientes c ON v.cod_cliente = c.cod_cliente " +
-                         "ORDER BY iv.cod_pedido";
-            resultSet = banco.statement.executeQuery(sql);
+        try {
+            Session session = banco.getSession();
 
-            while (resultSet.next()) {
+            // Query para buscar todos os itens de venda
+            String query = "MATCH (v:Venda)-[:CONTEM]->(l:Livro)<-[:FEZ]-(c:Cliente) RETURN v, l, c";
+            var result = session.run(query);
+
+            while (result.hasNext()) {
+                var record = result.next();
+
                 ItemVenda itemVenda = new ItemVenda();
                 Venda venda = new Venda();
                 Livro livro = new Livro();
                 Cliente cliente = new Cliente();
 
-                itemVenda.codPedido = resultSet.getInt("cod_pedido");
-                itemVenda.codLivro = resultSet.getInt("cod_livro");
-                itemVenda.qtdLivros = resultSet.getInt("qtd_livros");
+                // Preenchendo dados da venda
+                venda.setCodVenda(record.get("v").asNode().get("cod_venda").asInt());
+                venda.setMetodoPag(record.get("v").asNode().get("metodo_pag").asString());
+                // Atribua outros campos de Venda conforme necessário
 
-                livro.setCodLivro(resultSet.getInt("cod_livro"));
-                livro.setTitulo(resultSet.getString("titulo"));
-                livro.setGenero(resultSet.getString("genero"));
-                livro.setAutor(resultSet.getString("autor"));
-                livro.setIsbn(resultSet.getLong("isbn"));
-                livro.setAnoPublicacao(resultSet.getDate("ano_publicacao"));
-                livro.setPreco(resultSet.getDouble("preco"));
-                livro.setCodEditora(resultSet.getInt("cod_editora"));
+                // Preenchendo dados do livro
+                livro.setCodLivro(record.get("l").asNode().get("cod_livro").asInt());
+                livro.setTitulo(record.get("l").asNode().get("titulo").asString());
+                livro.setGenero(record.get("l").asNode().get("genero").asString());
+                livro.setAutor(record.get("l").asNode().get("autor").asString());
+                livro.setIsbn(record.get("l").asNode().get("isbn").asLong());
+                livro.setAnoPublicacao(Date.valueOf(record.get("l").asNode().get("ano_publicacao").asLocalDate()));
+                livro.setPreco(record.get("l").asNode().get("preco").asDouble());
+                // Atribua outros campos de Livro conforme necessário
 
-                venda.setCodVenda(resultSet.getInt("cod_venda"));
-                venda.setValorVenda(resultSet.getDouble("valor_venda"));
-                venda.setDataVenda(resultSet.getDate("data_venda"));
-                venda.setMetodoPag(resultSet.getString("metodo_pag"));
-                venda.setCodCliente(resultSet.getInt("cod_cliente"));
+                // Preenchendo dados do cliente
+                cliente.setCodCliente(record.get("c").asNode().get("cod_cliente").asInt());
+                cliente.setNome(record.get("c").asNode().get("nome").asString());
+                cliente.setSobrenome(record.get("c").asNode().get("sobrenome").asString());
+                cliente.setCpf(record.get("c").asNode().get("cpf").asLong());
+                cliente.setEmailCliente(record.get("c").asNode().get("email_cliente").asString());
+                cliente.setTelefoneCliente(record.get("c").asNode().get("telefone_cliente").asString());
+                cliente.setDataCadastro(Date.valueOf(record.get("c").asNode().get("data_cadastro").asLocalDate()));
+                // Atribua outros campos de Cliente conforme necessário
 
-                cliente.setCodCliente(resultSet.getInt("cod_cliente"));
-                cliente.setNome(resultSet.getString("nome"));
-                cliente.setSobrenome(resultSet.getString("sobrenome"));
-                cliente.setCpf(resultSet.getLong("cpf"));
-                cliente.setEmailCliente(resultSet.getString("email_cliente"));
-                cliente.setTelefoneCliente(resultSet.getString("telefone_cliente"));
-                cliente.setDataCadastro(resultSet.getDate("data_cadastro"));
-                cliente.setCodEndereco(resultSet.getInt("cod_endereco"));
+                itemVenda.setCodPedido((int) venda.getCodVenda());
+                itemVenda.setCodLivro(livro.getCodLivro());
+                itemVenda.setQtdLivros(1); // Exemplo, ajuste conforme sua lógica
+                itemVenda.setVenda(venda);
+                itemVenda.setLivro(livro);
+                itemVenda.setCliente(cliente);
 
-                itemVenda.venda = venda;
-                itemVenda.livro = livro;
-                itemVenda.cliente = cliente;
                 itensVendas.add(itemVenda);
             }
 
-        }catch (SQLException e) {
-            System.out.println("Erro ao buscar vendas!");
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return itensVendas;
     }
 
-    public static void editarItemVenda(DataBaseConection banco, ItemVenda venda, int codLivroOriginal) {
+    public static void editarItemVenda(DataBaseConection banco, ItemVenda itemVenda) {
         try {
-            String sqlVendas = "UPDATE vendas SET metodo_pag = ?, cod_cliente = ?, data_venda = ? " +
-                    "WHERE cod_venda = ?";
+            Session session = banco.getSession();
 
-            String sqlItemVenda = "UPDATE itens_vendas SET cod_livro = ?, qtd_livros = ? " +
-                    "WHERE cod_livro = ? AND cod_pedido = ?";
+            // Atualizar dados do item de venda
+            String query = "MATCH (v:Venda)-[r:CONTEM]->(l:Livro) " +
+                    "WHERE ID(v) = $codPedido AND ID(l) = $codLivro " +
+                    "SET r.qtdLivros = $qtdLivros";
+            session.run(query, Values.parameters(
+                    "codPedido", itemVenda.getVenda().getCodVenda(),
+                    "codLivro", itemVenda.getLivro().getCodLivro(),
+                    "qtdLivros", itemVenda.getQtdLivros()
+            ));
 
-            String sqlUpdateValorTotal = "UPDATE vendas SET valor_venda = ? WHERE cod_venda = ?";
-
-            // Atualiza os dados da venda na tabela vendas
-            banco.preparedStatement = banco.connection.prepareStatement(sqlVendas);
-            banco.preparedStatement.setString(1, venda.venda.getMetodoPag());
-            banco.preparedStatement.setInt(2, venda.cliente.getCodCliente());
-            banco.preparedStatement.setDate(3, venda.venda.getDataVenda());
-            banco.preparedStatement.setInt(4, venda.getCodPedido());
-            banco.preparedStatement.executeUpdate();
-
-            // Atualiza os dados do item de venda na tabela itens_vendas
-            banco.preparedStatement = banco.connection.prepareStatement(sqlItemVenda);
-            banco.preparedStatement.setInt(1, venda.livro.getCodLivro());
-            banco.preparedStatement.setInt(2, venda.getQtdLivros());
-            banco.preparedStatement.setInt(3, codLivroOriginal);
-            banco.preparedStatement.setInt(4, venda.getCodPedido());
-            banco.preparedStatement.executeUpdate();
-
-            // Após atualizar os dados, calcula o novo valor total da venda
-            String sqlCalcValorTotal = "SELECT l.preco, iv.qtd_livros " +
-                    "FROM livros l " +
-                    "JOIN itens_vendas iv ON l.cod_livro = iv.cod_livro " +
-                    "WHERE iv.cod_pedido = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sqlCalcValorTotal);
-            banco.preparedStatement.setInt(1, venda.getCodPedido());
-            ResultSet resultSet = banco.preparedStatement.executeQuery();
-
-            double novoValorTotal = 0;
-            while (resultSet.next()) {
-                double valor = resultSet.getDouble(1) * resultSet.getDouble(2);
-                novoValorTotal += valor;
-            }
-
-            // Atualiza o valor_venda na tabela vendas
-            banco.preparedStatement = banco.connection.prepareStatement(sqlUpdateValorTotal);
-            banco.preparedStatement.setDouble(1, novoValorTotal);
-            banco.preparedStatement.setInt(2, venda.getCodPedido());
-            banco.preparedStatement.executeUpdate();
-
-            System.out.println("Venda atualizada com sucesso!");
-
+            session.close();
+            System.out.println("Item de venda atualizado com sucesso!");
         } catch (Exception e) {
-            System.out.println("Não foi possível atualizar Venda!");
+            e.printStackTrace();
         }
     }
 
-
     public static void excluirItemVenda(DataBaseConection banco, ItemVenda itemVenda) {
-
-        String sqlVenda=      "DELETE FROM vendas WHERE cod_venda = ?";
-        String sqlItemVenda = "DELETE FROM itens_vendas WHERE cod_pedido = ?";
-
         try {
-            PreparedStatement statementExcluirIV = banco.connection.prepareStatement(sqlItemVenda);
-            statementExcluirIV.setInt(1, itemVenda.getCodPedido());
+            Session session = banco.getSession();
 
-            statementExcluirIV.executeUpdate();
+            // Excluir relacionamento de venda com livro
+            String query = "MATCH (v:Venda)-[r:CONTEM]->(l:Livro) " +
+                    "WHERE ID(v) = $codPedido AND ID(l) = $codLivro " +
+                    "DELETE r";
+            session.run(query, Values.parameters(
+                    "codPedido", itemVenda.getVenda().getCodVenda(),
+                    "codLivro", itemVenda.getLivro().getCodLivro()
+            ));
 
-            PreparedStatement statementExcluirV = banco.connection.prepareStatement(sqlVenda);
-            statementExcluirV.setInt(1, itemVenda.venda.getCodVenda());
-
-            int rowsDeleted = statementExcluirV.executeUpdate();
-
-            if (rowsDeleted > 0) {
-                System.out.println("Livro excluído com sucesso!");
-            } else{
-                System.out.println("Não foi possivel excluir Venda!");
-            }
-        } catch (SQLException e) {
-            System.out.println("Não foi possivel excluir Venda!");
+            session.close();
+            System.out.println("Item de venda excluído com sucesso!");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

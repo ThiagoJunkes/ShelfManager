@@ -2,10 +2,13 @@ package model;
 
 import dao.DataBaseConection;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.types.Node;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Cliente {
@@ -115,71 +118,70 @@ public class Cliente {
         }
     }
 
-    public static boolean editarCliente(Cliente cliente, DataBaseConection banco) {
-        boolean sucesso = false;
+    public static boolean editarCliente(Cliente clienteAtualizado, DataBaseConection banco) {
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (cliente:Cliente {cpf: " + clienteAtualizado.getCpf() + "}) " +
+                    "SET cliente.nome = '" + clienteAtualizado.getNome() + "', " +
+                    "    cliente.sobrenome = '" + clienteAtualizado.getSobrenome() + "', " +
+                    "    cliente.email_cliente = '" + clienteAtualizado.getEmailCliente() + "', " +
+                    "    cliente.telefone_cliente = '" + clienteAtualizado.getTelefoneCliente() + "' " +
+                    "RETURN cliente";
 
-        try {
-            String sql = "UPDATE clientes " +
-                    "SET nome = ?, sobrenome = ?, cpf = ?, email_cliente = ?, telefone_cliente = ?, cod_endereco = ? " +
-                    "WHERE cod_cliente = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sql);
+            List<Record> result = session.writeTransaction(tx -> {
+                Result resultSet = tx.run(query);
+                return resultSet.list();
+            });
 
-            banco.preparedStatement.setString(1, cliente.getNome());
-            banco.preparedStatement.setString(2, cliente.getSobrenome());
-            banco.preparedStatement.setLong(3, cliente.getCpf());
-            banco.preparedStatement.setString(4, cliente.getEmailCliente());
-            banco.preparedStatement.setString(5, cliente.getTelefoneCliente());
-            banco.preparedStatement.setInt(6, cliente.getCodEndereco());
-            banco.preparedStatement.setInt(7, cliente.getCodCliente());
-
-            int linhasAfetadas = banco.preparedStatement.executeUpdate();
-            if (linhasAfetadas > 0) {
-                sucesso = true;
+            if (!result.isEmpty()) {
                 System.out.println("Cliente atualizado com sucesso!");
+                return true;
             } else {
                 System.out.println("Nenhum cliente atualizado.");
+                return false;
             }
-
-        } catch (SQLException e) {
-            System.out.println("Nenhum cliente atualizado.");
+        } catch (Exception e) {
+            System.out.println("Falha ao atualizar cliente.");
+            return false;
         }
-
-        return sucesso;
     }
+
 
 
     public static List<Cliente> buscarClientes(DataBaseConection banco){
         List<Cliente> clientes = new ArrayList<>();
-        ResultSet resultSet = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        try{
-            String sql = "SELECT c.*, e.* FROM clientes c JOIN enderecos e on c.cod_endereco = e.cod_endereco ORDER BY cod_cliente";
-            resultSet = banco.statement.executeQuery(sql);
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (cliente:Cliente)-[:mora_em]->(endereco:Endereco) RETURN cliente, endereco ORDER BY cliente.cpf";
+            try (Transaction tx = session.beginTransaction()) {
+                Result result = tx.run(query);
 
-            while (resultSet.next()) {
-                Cliente cliente = new Cliente();
-                Endereco endereco = new Endereco();
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    Node clienteNode = record.get("cliente").asNode();
+                    Node enderecoNode = record.get("endereco").asNode();
 
-                cliente.codCliente = resultSet.getInt("cod_cliente");
-                cliente.nome = resultSet.getString("nome");
-                cliente.sobrenome = resultSet.getString("sobrenome");
-                cliente.cpf = resultSet.getLong("cpf");
-                cliente.emailCliente = resultSet.getString("email_cliente");
-                cliente.telefoneCliente = resultSet.getString("telefone_cliente");
-                cliente.dataCadastro = resultSet.getDate("data_cadastro");
-                cliente.codEndereco = resultSet.getInt("cod_endereco");
-                endereco.setCodEndereco(resultSet.getInt("cod_endereco"));
-                endereco.setRua(resultSet.getString("rua"));
-                endereco.setCidade(resultSet.getString("cidade"));
-                endereco.setEstado(resultSet.getString("estado"));
-                endereco.setCep(resultSet.getInt("cep"));
-                endereco.setComplemento(resultSet.getString("complemento"));
+                    Cliente cliente = new Cliente();
+                    Endereco endereco = new Endereco();
 
-                cliente.endereco = endereco;
-                clientes.add(cliente);
+                    cliente.setCodCliente(clienteNode.get("codCliente").asInt());
+                    cliente.setNome(clienteNode.get("nome").asString());
+                    cliente.setSobrenome(clienteNode.get("sobrenome").asString());
+                    cliente.setCpf(clienteNode.get("cpf").asLong());
+                    cliente.setEmailCliente(clienteNode.get("email").asString());
+                    cliente.setTelefoneCliente(clienteNode.get("telefone").asString());
+                    cliente.setDataCadastro(sdf.parse(clienteNode.get("data_cadastro").asString()));
+
+                    endereco.setRua(enderecoNode.get("rua").asString());
+                    endereco.setCidade(enderecoNode.get("cidade").asString());
+                    endereco.setEstado(enderecoNode.get("estado").asString());
+                    endereco.setCep(enderecoNode.get("cep").asInt());
+                    endereco.setComplemento(enderecoNode.get("complemento").asString());
+                    cliente.endereco = endereco;
+                    clientes.add(cliente);
+                }
             }
-
-        }catch (SQLException e) {
+        }catch (Exception e) {
             System.out.println("Erro ao buscar Clientes: " + e.getMessage());
         }
 
@@ -187,82 +189,59 @@ public class Cliente {
     }
 
     public static boolean adicionarCliente(Cliente cliente, DataBaseConection banco) {
-        boolean sucesso = false;
+        try (Session session = banco.getSession()) {
+            // Cria a query para adicionar Cliente e Endereço
+            String query = "CREATE (endereco:Endereco {rua: '" + cliente.endereco.getRua() + "', " +
+                    "cidade: '" + cliente.endereco.getCidade() + "', " +
+                    "estado: '" + cliente.endereco.getEstado() + "', " +
+                    "cep: " + cliente.endereco.getCep() + ", " +
+                    "complemento: '" + cliente.endereco.getComplemento() + "'}) " +
+                    "CREATE (cliente:Cliente {nome: '" + cliente.getNome() + "', " +
+                    "sobrenome: '" + cliente.getSobrenome() + "', " +
+                    "cpf: " + cliente.getCpf() + ", " +
+                    "email: '" + cliente.getEmailCliente() + "', " +
+                    "telefone: '" + cliente.getTelefoneCliente() + "', " +
+                    "data_cadastro: '" + cliente.getDataCadastro().toString() + "'}) " +
+                    "CREATE (cliente)-[:MORA_EM]->(endereco)";
 
-        try {
-            // Insere o endereço primeiro
-            String sqlEndereco = "INSERT INTO enderecos (rua, cidade, estado, cep, complemento) VALUES (?, ?, ?, ?, ?) RETURNING cod_endereco";
-            banco.preparedStatement = banco.connection.prepareStatement(sqlEndereco);
-            banco.preparedStatement.setString(1, cliente.endereco.getRua());
-            banco.preparedStatement.setString(2, cliente.endereco.getCidade());
-            banco.preparedStatement.setString(3, cliente.endereco.getEstado());
-            banco.preparedStatement.setInt(4, cliente.endereco.getCep());
-            banco.preparedStatement.setString(5, cliente.endereco.getComplemento());
+            // Executa a query em uma transação
+            session.writeTransaction(tx -> {
+                tx.run(query);
+                return null;
+            });
 
-            // Executa a inserção e obtém o ID do endereço inserido
-            ResultSet resultSetEndereco = banco.preparedStatement.executeQuery();
-            int codEndereco = -1; // Valor inicial inválido
-            if (resultSetEndereco.next()) {
-                codEndereco = resultSetEndereco.getInt(1); // Pega o primeiro resultado da primeira coluna
-            }
-
-            if (codEndereco != -1) {
-                // Se o endereço foi inserido com sucesso, insere o cliente
-                String sqlCliente = "INSERT INTO clientes (nome, sobrenome, cpf, email_cliente, telefone_cliente, cod_endereco) " +
-                        "VALUES (?, ?, ?, ?, ?, ?)";
-                banco.preparedStatement = banco.connection.prepareStatement(sqlCliente);
-                banco.preparedStatement.setString(1, cliente.getNome());
-                banco.preparedStatement.setString(2, cliente.getSobrenome());
-                banco.preparedStatement.setLong(3, cliente.getCpf());
-                banco.preparedStatement.setString(4, cliente.getEmailCliente());
-                banco.preparedStatement.setString(5, cliente.getTelefoneCliente());
-                banco.preparedStatement.setInt(6, codEndereco);
-
-                int linhasAfetadasCliente = banco.preparedStatement.executeUpdate();
-                if (linhasAfetadasCliente > 0) {
-                    sucesso = true;
-                    System.out.println("Cliente adicionado com sucesso!");
-                } else {
-                    System.out.println("Falha ao adicionar cliente.");
-                }
-            } else {
-                System.out.println("Falha ao obter o ID do endereço.");
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Falha ao adicionar cliente.");
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-
-        return sucesso;
     }
 
-    public static void excluirCliente(Cliente cliente, DataBaseConection banco) {
 
-        try {
-            String sqlVerificarCompras = "SELECT cod_venda FROM vendas WHERE cod_cliente = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sqlVerificarCompras);
-            banco.preparedStatement.setInt(1, cliente.getCodCliente());
-            ResultSet rs = banco.preparedStatement.executeQuery();
+    public static boolean excluirCliente(Cliente clienteExcluir, DataBaseConection banco) {
+        try (Session session = banco.getSession()) {
+            String verificarComprasQuery = "MATCH (cliente:Cliente {cpf: " + clienteExcluir.getCpf() + "})-[:REALIZOU_COMPRA]->(venda:Venda) RETURN venda";
 
-            if (rs.next()) {
+            boolean possuiCompras = session.readTransaction(tx -> tx.run(verificarComprasQuery).hasNext());
+
+            if (possuiCompras) {
                 System.out.println("Não é possível excluir o cliente pois ele já realizou uma compra.");
+                return false;
             } else {
-                String sqlCliente = "DELETE FROM clientes WHERE cod_cliente = ?";
-                banco.preparedStatement = banco.connection.prepareStatement(sqlCliente);
-                banco.preparedStatement.setInt(1, cliente.getCodCliente());
+                String query = "MATCH (cliente:Cliente {cpf: " + clienteExcluir.getCpf() + "}) " +
+                        "OPTIONAL MATCH (cliente)-[r:MORA_EM]->(endereco:Endereco) " +
+                        "DELETE cliente, r, endereco";
 
-                int linhasAfetadasCliente = banco.preparedStatement.executeUpdate();
-                if (linhasAfetadasCliente > 0) {
-                    System.out.println("Cliente excluído com sucesso!");
-                    Endereco.excluirEndereco(cliente.endereco, banco);
-                } else {
-                    System.out.println("Falha ao excluir cliente.");
-                }
+                session.writeTransaction(tx -> {
+                    tx.run(query);
+                    return null;
+                });
+
+                System.out.println("Cliente excluído com sucesso!");
+                return true;
             }
-
-            rs.close();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.out.println("Falha ao excluir cliente.");
+            return false;
         }
     }
 

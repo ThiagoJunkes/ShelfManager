@@ -1,11 +1,13 @@
 package model;
 
 import dao.DataBaseConection;
+import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.types.Node;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Estoque {
@@ -38,60 +40,72 @@ public class Estoque {
         System.out.println("Quantidade:   " + qtdEstoque);
     }
 
-    public static List<Estoque> buscarEstoque(DataBaseConection banco){
+    public static List<Estoque> buscarEstoque(DataBaseConection banco) {
         List<Estoque> estoque = new ArrayList<>();
-        ResultSet resultSet = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        try{
-            String sql = "SELECT e.*, l.* FROM estoque e JOIN livros l ON e.cod_livro = l.cod_livro ORDER BY e.qtd_estoque";
-            resultSet = banco.statement.executeQuery(sql);
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (e:Estoque)-[:INCLUI]->(livro:Livro) " +
+                    "RETURN e.cod_livro AS codLivro, e.qtd_estoque AS qtdEstoque, " +
+                    "       livro.cod_livro AS codLivroLivro, livro.titulo AS titulo, " +
+                    "       livro.genero AS genero, livro.autor AS autor, " +
+                    "       livro.isbn AS isbn, livro.ano_publicacao AS anoPublicacao, " +
+                    "       livro.preco AS preco, livro.cod_editora AS codEditora";
 
-            while (resultSet.next()) {
+            List<Record> result = session.readTransaction(tx -> {
+                Result resultSet = tx.run(query);
+                return resultSet.list();
+            });
+
+            for (Record record : result) {
+                Value estNode = record.get("e");
+                Value livroNode = record.get("livro");
+
                 Estoque est = new Estoque();
-                Livro livro = new Livro();
+                est.setCodLivro(estNode.get("codLivro").asInt());
+                est.setQtdEstoque(estNode.get("qtdEstoque").asInt());
 
-                est.codLivro = resultSet.getInt("cod_livro");
-                est.qtdEstoque = resultSet.getInt("qtd_estoque");
-                livro.setCodLivro(resultSet.getInt("cod_livro"));
-                livro.setTitulo(resultSet.getString("titulo"));
-                livro.setGenero(resultSet.getString("genero"));
-                livro.setAutor(resultSet.getString("autor"));
-                livro.setIsbn(resultSet.getLong("isbn"));
-                livro.setAnoPublicacao(resultSet.getDate("ano_publicacao"));
-                livro.setPreco(resultSet.getDouble("preco"));
-                livro.setCodEditora(resultSet.getInt("cod_Editora"));
+                Livro livro = new Livro();
+                livro.setCodLivro(livroNode.get("codLivroLivro").asInt());
+                livro.setTitulo(livroNode.get("titulo").asString());
+                livro.setGenero(livroNode.get("genero").asString());
+                livro.setAutor(livroNode.get("autor").asString());
+                livro.setIsbn(livroNode.get("isbn").asLong());
+                livro.setAnoPublicacao(sdf.parse(livroNode.get("anoPublicacao").asString()));
+                livro.setPreco(livroNode.get("preco").asDouble());
+                livro.setCodEditora(livroNode.get("codEditora").asInt());
 
                 est.livro = livro;
                 estoque.add(est);
             }
 
-        }catch (SQLException e) {
-            System.out.println("Erro ao buscar Estoque: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Falha ao buscar Estoque.");
         }
 
         return estoque;
     }
 
     public static void editarEstoque(Estoque est, DataBaseConection banco) {
-        try {
-            String sql = "UPDATE estoque " +
-                    "SET qtd_estoque = ? " +
-                    "WHERE cod_livro = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sql);
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (e:Estoque {cod_livro: " + est.getCodLivro() + "}) " +
+                    "SET e.qtd_estoque = " + est.getQtdEstoque() + " " +
+                    "RETURN e";
 
-            banco.preparedStatement.setInt(1, est.getQtdEstoque());
-            banco.preparedStatement.setInt(2, est.getCodLivro());
+            List<Record> result = session.writeTransaction(tx -> {
+                Result resultSet = tx.run(query);
+                return resultSet.list();
+            });
 
-            int linhasAfetadas = banco.preparedStatement.executeUpdate();
-
-            if (linhasAfetadas > 0) {
+            if (!result.isEmpty()) {
                 System.out.println("Estoque atualizado com sucesso!");
             } else {
                 System.out.println("Nenhum estoque de livro atualizado.");
             }
 
-        } catch (SQLException e) {
-            System.out.println("Nenhum estoque de livro atualizado.");
+        } catch (Exception e) {
+            System.out.println("Falha ao atualizar Estoque.");
         }
     }
 }

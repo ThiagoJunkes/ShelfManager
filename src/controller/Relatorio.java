@@ -170,7 +170,7 @@ public class Relatorio {
         Connection conn = null;
         try {
             DataBaseConection dbConnection = new DataBaseConection();
-            conn = dbConnection.connection;
+            conn = null;//dbConnection.connection;
 
             Scanner scanner = new Scanner(System.in);
             int opcao;

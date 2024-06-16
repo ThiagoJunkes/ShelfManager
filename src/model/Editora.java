@@ -1,11 +1,13 @@
 package model;
 
 import dao.DataBaseConection;
+import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.types.Node;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Editora {
@@ -63,121 +65,115 @@ public class Editora {
         System.out.println("3. Email da Editora:    " + emailEditora);
         System.out.println("4. Telefone da Editora: " + telefoneEditora);
     }
-    public static List<Editora> buscarEditoras(DataBaseConection banco){
+    public static List<Editora> buscarEditoras(DataBaseConection banco) {
         List<Editora> editoras = new ArrayList<>();
-        ResultSet resultSet = null;
 
-        try{
-            String sql = "SELECT * FROM editoras";
-            resultSet = banco.statement.executeQuery(sql);
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (editora:Editora) RETURN editora.codEditora AS codEditora, " +
+                    "editora.nomeEditora AS nomeEditora, " +
+                    "editora.nomeContato AS nomeContato, " +
+                    "editora.email AS emailEditora, " +
+                    "editora.telefone AS telefoneEditora";
 
-            while (resultSet.next()) {
+            List<Record> result = session.readTransaction(tx -> {
+                Result resultSet = tx.run(query);
+                return resultSet.list();
+            });
+
+            for (Record record : result) {
                 Editora editora = new Editora();
-
-                editora.codEditora = resultSet.getInt("cod_editora");
-                editora.nomeEditora = resultSet.getString("nome_editora");
-                editora.nomeContato = resultSet.getString("nome_contato");
-                editora.emailEditora = resultSet.getString("email_editora");
-                editora.telefoneEditora = resultSet.getString("telefone_editora");
-
+                editora.codEditora = record.get("codEditora").asInt();
+                editora.nomeEditora = record.get("nomeEditora").asString();
+                editora.nomeContato = record.get("nomeContato").asString();
+                editora.emailEditora = record.get("emailEditora").asString();
+                editora.telefoneEditora = record.get("telefoneEditora").asString();
                 editoras.add(editora);
             }
 
-        }catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-        return  editoras;
+        return editoras;
     }
 
-    public static void editarEditora(Editora editora, DataBaseConection banco) {
-        try {
-            String sql = "UPDATE editoras SET nome_editora = ?, nome_contato = ?, email_editora = ?, telefone_editora = ? WHERE cod_editora = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sql);
+    public static boolean editarEditora(Editora editora, DataBaseConection banco) {
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (editora:Editora {email: '" + editora.getEmailEditora() + "'}) " +
+                    "SET editora.nome_editora = '" + editora.getNomeEditora() + "', " +
+                    "    editora.nome_contato = '" + editora.getNomeContato() + "', " +
+                    "    editora.telefone = '" + editora.getTelefoneEditora() + "' " +
+                    "RETURN editora";
 
-            banco.preparedStatement.setString(1, editora.getNomeEditora());
-            banco.preparedStatement.setString(2, editora.getNomeContato());
-            banco.preparedStatement.setString(3, editora.getEmailEditora());
-            banco.preparedStatement.setString(4, editora.getTelefoneEditora());
-            banco.preparedStatement.setInt(5, editora.getCodEditora());
+            List<Record> result = session.writeTransaction(tx -> {
+                Result resultSet = tx.run(query);
+                return resultSet.list();
+            });
 
-            int linhasAfetadas = banco.preparedStatement.executeUpdate();
-            if (linhasAfetadas > 0) {
+            if (!result.isEmpty()) {
                 System.out.println("Editora atualizada com sucesso!");
+                return true;
             } else {
-                System.out.println("Falha ao atualizar editora.");
+                System.out.println("Nenhuma editora atualizada.");
+                return false;
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (banco.preparedStatement != null) {
-                    banco.preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            System.out.println("Falha ao atualizar editora.");
+            return false;
         }
     }
+
     public static boolean adicionarEditora(Editora editora, DataBaseConection banco) {
-        boolean sucesso = false;
-        try {
-            String sql = "INSERT INTO editoras (nome_editora, nome_contato, email_editora, telefone_editora) VALUES (?, ?, ?, ?)";
-            PreparedStatement preparedStatement = banco.connection.prepareStatement(sql);
-            preparedStatement.setString(1, editora.getNomeEditora());
-            preparedStatement.setString(2, editora.getNomeContato());
-            preparedStatement.setString(3, editora.getEmailEditora());
-            preparedStatement.setString(4, editora.getTelefoneEditora());
+        try (Session session = banco.getSession()) {
+            String query = "CREATE (editora:Editora {nome: '" + editora.getNomeEditora() + "', " +
+                    "nome_contato: '" + editora.getNomeContato() + "', " +
+                    "email: '" + editora.getEmailEditora() + "', " +
+                    "telefone: '" + editora.getTelefoneEditora() + "'})";
 
-            int linhasAfetadas = preparedStatement.executeUpdate();
-            if (linhasAfetadas > 0) {
-                System.out.println("Editora adicionada com sucesso.");
-                sucesso = true;
-            } else {
-                System.out.println("Falha ao adicionar editora.");
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro ao adicionar editora: " + e.getMessage());
+            session.writeTransaction(tx -> {
+                tx.run(query);
+                return null;
+            });
+
+            System.out.println("Editora adicionada com sucesso.");
+            return true;
+        } catch (Exception e) {
             System.out.println("Falha ao adicionar editora.");
+            return false;
         }
-        return sucesso;
     }
-    public static void excluirEditora(Editora editora, DataBaseConection banco) {
-        try {
+
+    public static boolean excluirEditora(Editora editora, DataBaseConection banco) {
+        try (Session session = banco.getSession()) {
             // Verificar se existem livros associados à editora
-            String sqlLivros = "SELECT * FROM livros WHERE cod_editora = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sqlLivros);
-            banco.preparedStatement.setInt(1, editora.getCodEditora());
-            ResultSet resultSet = banco.preparedStatement.executeQuery();
+            String queryVerificarLivros = "MATCH (livro:Livro)-[:EDITORA]->(editora:Editora {nome: '" + editora.getNomeEditora() + "'}) RETURN livro";
 
-            if (resultSet.next()) {
+            List<Record> livrosAssociados = session.readTransaction(tx -> {
+                Result result = tx.run(queryVerificarLivros);
+                return result.list();
+            });
+
+            if (!livrosAssociados.isEmpty()) {
                 System.out.println("Não é possível excluir a editora pois existem livros associados a ela.");
-                return;
+                return false;
             }
 
-            // Se não há livros, então pode excluir a editora
-            String sql = "DELETE FROM editoras WHERE cod_editora = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sql);
-            banco.preparedStatement.setInt(1, editora.getCodEditora());
+            // Se não há livros associados, então pode excluir a editora
+            String queryExcluirEditora = "MATCH (editora:Editora {nome: '" + editora.getNomeEditora() + "'}) " +
+                    "DETACH DELETE editora";
 
-            int linhasAfetadas = banco.preparedStatement.executeUpdate();
-            if (linhasAfetadas > 0) {
-                System.out.println("Editora excluída com sucesso!");
-            } else {
-                System.out.println("Falha ao excluir editora.");
-            }
-        } catch (SQLException e) {
+            session.writeTransaction(tx -> {
+                tx.run(queryExcluirEditora);
+                return null;
+            });
+
+            System.out.println("Editora excluída com sucesso!");
+            return true;
+        } catch (Exception e) {
             System.out.println("Falha ao excluir editora.");
-        } finally {
-            try {
-                if (banco.preparedStatement != null) {
-                    banco.preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            return false;
         }
     }
+
 }
 

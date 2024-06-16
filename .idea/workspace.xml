@@ -10,21 +10,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="32c97c09-6cb3-43fc-9e7f-b8d0fe87f2a9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/MainTeste.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ShelfManager.iml" beforeDir="false" afterPath="$PROJECT_DIR$/ShelfManager.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/postgresql-42.7.3.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TesteConexao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TesteConexao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller/Relatorio.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dao/DataBaseConection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/dao/DataBaseConection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Cliente.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Editora.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Endereco.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Estoque.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/ItemVenda.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Livro.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Venda.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/Menu.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controller/Relatorio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/Relatorio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Cliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Cliente.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Editora.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Editora.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Endereco.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Endereco.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Estoque.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Estoque.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/ItemVenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/ItemVenda.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Livro.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Livro.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Venda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Venda.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,6 +73,13 @@
   }
 }</component>
   <component name="RunManager">
+    <configuration name="MainTeste" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="MainTeste" />
+      <module name="ShelfManager" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
         <option name="Make" enabled="true" />
@@ -88,6 +91,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.MainTeste" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -107,6 +115,8 @@
       <workItem from="1715897594627" duration="493000" />
       <workItem from="1717959549714" duration="3859000" />
       <workItem from="1717968131151" duration="359000" />
+      <workItem from="1718460900934" duration="9745000" />
+      <workItem from="1718574963261" duration="5332000" />
     </task>
     <servers />
   </component>
@@ -116,11 +126,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/model/ItemVenda.java</url>
-          <line>190</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/controller/Relatorio.java</url>
           <line>171</line>

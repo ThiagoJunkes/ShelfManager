@@ -1,10 +1,13 @@
 package model;
 
 import dao.DataBaseConection;
+import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.types.Node;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Endereco {
@@ -64,85 +67,87 @@ public class Endereco {
         this.complemento = complemento;
     }
 
-    public static List<Endereco> buscarEnderecos(DataBaseConection banco){
-        List<Endereco> enderecos = new ArrayList<>();
-        ResultSet resultSet = null;
-
-        try{
-            String sql = "SELECT * FROM enderecos";
-            resultSet = banco.statement.executeQuery(sql);
-
-            while (resultSet.next()) {
-                Endereco endereco = new Endereco();
-
-                endereco.codEndereco = resultSet.getInt("cod_endereco");
-                endereco.rua = resultSet.getString("rua");
-                endereco.cidade = resultSet.getString("cidade");
-                endereco.estado = resultSet.getString("estado");
-                endereco.cep = resultSet.getInt("cep");
-                endereco.complemento = resultSet.getString("complemento");
-
-                enderecos.add(endereco);
-            }
-
-        }catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return  enderecos;
-    }
-
     public static boolean editarEndereco(Endereco endereco, DataBaseConection banco) {
         boolean sucesso = false;
 
-        try {
-            String sql = "UPDATE enderecos " +
-                    "SET rua = ?, cidade = ?, estado = ?, cep = ?, complemento = ? " +
-                    "WHERE cod_endereco = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sql);
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (e:Endereco {cod_endereco: " + endereco.getCodEndereco() + "}) " +
+                    "SET e.rua = '" + endereco.getRua() + "', " +
+                    "    e.cidade = '" + endereco.getCidade() + "', " +
+                    "    e.estado = '" + endereco.getEstado() + "', " +
+                    "    e.cep = " + endereco.getCep() + ", " +
+                    "    e.complemento = '" + endereco.getComplemento() + "' " +
+                    "RETURN e";
 
-            banco.preparedStatement.setString(1, endereco.getRua());
-            banco.preparedStatement.setString(2, endereco.getCidade());
-            banco.preparedStatement.setString(3, endereco.getEstado());
-            banco.preparedStatement.setInt(4, endereco.getCep());
-            banco.preparedStatement.setString(5, endereco.getComplemento());
-            banco.preparedStatement.setInt(6, endereco.getCodEndereco());
+            List<Record> result = session.writeTransaction(tx -> {
+                Result resultSet = tx.run(query);
+                return resultSet.list();
+            });
 
-
-            int linhasAfetadas = banco.preparedStatement.executeUpdate();
-            if (linhasAfetadas > 0) {
+            if (!result.isEmpty()) {
+                System.out.println("Endereço atualizado com sucesso!");
                 sucesso = true;
-                System.out.println("Cliente atualizado com sucesso!");
             } else {
-                System.out.println("Nenhum cliente atualizado.");
+                System.out.println("Nenhum endereço atualizado.");
             }
-
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (banco.preparedStatement != null) {
-                    banco.preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Falha ao atualizar endereço.");
         }
 
         return sucesso;
     }
 
     public static void excluirEndereco(Endereco endereco, DataBaseConection banco) {
-        try {
-            String sqlEndereco = "DELETE FROM enderecos WHERE cod_endereco = ?";
-            banco.preparedStatement = banco.connection.prepareStatement(sqlEndereco);
-            banco.preparedStatement.setInt(1, endereco.getCodEndereco());
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (e:Endereco {cod_endereco: " + endereco.getCodEndereco() + "}) " +
+                    "DETACH DELETE e";
 
-            int linhasAfetadasEndereco = banco.preparedStatement.executeUpdate();
+            session.writeTransaction(tx -> {
+                tx.run(query);
+                return null;
+            });
 
-        } catch (SQLException e) {
+            System.out.println("Endereço excluído com sucesso!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Falha ao excluir endereço.");
         }
     }
+
+    public static List<Endereco> buscarEnderecos(DataBaseConection banco) {
+        List<Endereco> enderecos = new ArrayList<>();
+
+        try (Session session = banco.getSession()) {
+            String query = "MATCH (e:Endereco) RETURN e";
+
+            List<Record> result = session.readTransaction(tx -> {
+                Result resultSet = tx.run(query);
+                return resultSet.list();
+            });
+
+            for (Record record : result) {
+                Node enderecoNode = record.get("e").asNode();
+                Endereco endereco = new Endereco();
+
+                endereco.setCodEndereco(enderecoNode.get("cod_endereco").asInt());
+                endereco.setRua(enderecoNode.get("rua").asString());
+                endereco.setCidade(enderecoNode.get("cidade").asString());
+                endereco.setEstado(enderecoNode.get("estado").asString());
+                endereco.setCep(enderecoNode.get("cep").asInt());
+                endereco.setComplemento(enderecoNode.get("complemento").asString());
+
+                enderecos.add(endereco);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Falha ao buscar endereços.");
+        }
+
+        return enderecos;
+    }
+
 
 }
 
