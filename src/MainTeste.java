@@ -729,7 +729,7 @@ public class MainTeste {
     private static void opcaoEstoque(DataBaseConection banco){
         Scanner scanner = new Scanner(System.in);
 
-        List<Estoque> estoques = Estoque.buscarEstoque(banco);
+        List<Livro> estoques = Livro.buscarLivros(banco);
         Menu.estoque(estoques);
         System.out.println("* Ao adicionar um Livro ele automaticamente aparece em estoque.");
         System.out.println("* Não é possivel excluir diretamente no estoque.");
@@ -745,8 +745,8 @@ public class MainTeste {
                 try{
                     int escolhaEst = Integer.parseInt(scanner.nextLine());
                     boolean hasEstoque = false;
-                    Estoque estoqueEditar = new Estoque();
-                    for (Estoque est : estoques) {
+                    Livro estoqueEditar = new Livro();
+                    for (Livro est : estoques) {
                         if(est.getCodLivro() == escolhaEst){
                             hasEstoque = true;
                             estoqueEditar = est;
@@ -754,7 +754,7 @@ public class MainTeste {
                         }
                     }
                     if(hasEstoque){
-                        estoqueEditar.printEstoqueSemFormatacao();
+                        estoqueEditar.printEstoqueSemFormatacaoEstoque();
                         System.out.print("Digite a nova quantidade no estoque: ");
                         int quantidade = Integer.parseInt(scanner.nextLine());
                         while(quantidade < 0){
@@ -764,7 +764,7 @@ public class MainTeste {
 
                         }
                         estoqueEditar.setQtdEstoque(quantidade);
-                        Estoque.editarEstoque(estoqueEditar, banco);
+                        Livro.editarEstoque(estoqueEditar, banco);
                     }
                     else {
                         System.out.println("Livro não encontrado no estoque!");

@@ -123,6 +123,13 @@ public class Livro {
                 tituloFormatado, genero, editoraFormatada, isbn);
     }
 
+    public void printEstoqueSemFormatacaoEstoque(){
+        System.out.println("Código Livro: " + codLivro);
+        System.out.println("Título:       " + getTitulo());
+        System.out.println("ISBN:         " + getIsbn());
+        System.out.println("Quantidade:   " + qtdEstoque);
+    }
+
     public void printLivroSemFormatacao() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String dataFormatada = sdf.format(anoPublicacao);
@@ -302,6 +309,31 @@ public class Livro {
         }
     }
 
+    public static boolean editarEstoque(Livro livroAtualizado, DataBaseConection banco) {
+        try (Session session = banco.getSession()) {
 
+            // Consulta para atualizar os estoque do livro
+            String atualizarCamposEstoqueQuery = "MATCH (livro:Livro {isbn: " + livroAtualizado.getIsbn() + "}) " +
+                    "   SET livro.quantidade_estoque = " + livroAtualizado.getQtdEstoque() + " " +
+                    "RETURN livro";
+
+            List<Record> result = session.writeTransaction(tx -> {
+                Result resultSet = tx.run(atualizarCamposEstoqueQuery);
+                return resultSet.list();
+            });
+
+            if (!result.isEmpty()) {
+                System.out.println("Estoque atualizado com sucesso!");
+                return true;
+            } else {
+                System.out.println("Estoque não foi atualizado.");
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Falha ao atualizar estoque.");
+            return false;
+        }
+    }
 
 }

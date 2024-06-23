@@ -82,18 +82,18 @@ public class Menu {
     }
 
 
-    public static void estoque(List<Estoque> estoque){
+    public static void estoque(List<Livro> estoque){
         System.out.println("| Cod Livro |  Quantidade  |  Título do Livro          | ISBN            |");
         System.out.println("|-----------|--------------|---------------------------|-----------------|");
 
-        for (Estoque est : estoque) {
+        for (Livro livro : estoque) {
             // Limitando o tamanho dos campos
-            String quantidade = String.valueOf(est.getQtdEstoque());
-            String titulo = est.livro.getTitulo().length() > 25 ? est.livro.getTitulo().substring(0, 25) : est.livro.getTitulo();
-            String isbn = String.valueOf(est.livro.getIsbn());
+            String quantidade = String.valueOf(livro.getQtdEstoque());
+            String titulo = livro.getTitulo().length() > 25 ? livro.getTitulo().substring(0, 25) : livro.getTitulo();
+            String isbn = String.valueOf(livro.getIsbn());
 
             System.out.printf("| %-9d | %-12s | %-25s | %-15s |\n",
-                    est.getCodLivro(),
+                    livro.getCodLivro(),
                     quantidade,
                     titulo,
                     isbn);
