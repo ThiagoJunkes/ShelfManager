@@ -6,6 +6,8 @@ import org.neo4j.driver.Record;
 import org.neo4j.driver.types.Node;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -126,22 +128,22 @@ public class Livro {
         String dataFormatada = sdf.format(anoPublicacao);
 
         System.out.println("Livro: " + titulo);
-        System.out.println("0 - Para voltar ao Menu e alterar a Editora no Menu Editoras");
+        System.out.println("0 - Para voltar ao Menu");
         System.out.println("1 - Título:            " + titulo);
         System.out.println("2 - Gênero:            " + genero);
         System.out.println("3 - Autor:             " + autor);
-        System.out.println("4 - ISBN:              " + isbn);
-        System.out.println("5 - Ano de Publicação: " + dataFormatada);
-        System.out.println("6 - Preço:             " + preco);
-        System.out.println("7 - Editora:           " + editora.getCodEditora() + " | " + editora.getNomeEditora());
+        System.out.println("4 - Ano de Publicação: " + dataFormatada);
+        System.out.println("5 - Preço:             " + preco);
+        System.out.println("6 - Editora:           " + editora.getCodEditora() + " | " + editora.getNomeEditora());
     }
 
     public static List<Livro> buscarLivros(DataBaseConection banco) {
         List<Livro> livros = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        int cod_livro = 1, cod_editora = 1;
 
         try (Session session = banco.getSession()) {
-            String query = "MATCH (livro:Livro)-[:EDITORA]->(editora:Editora) RETURN livro, editora";
+            String query = "MATCH (livro:Livro)-[:publicado_por]->(editora:Editora) RETURN livro, editora";
             try (Transaction tx = session.beginTransaction()){
                  Result result = tx.run(query);
 
@@ -151,6 +153,7 @@ public class Livro {
                     Node editoraNode = record.get("editora").asNode();
 
                     Livro livro = new Livro();
+                    livro.setCodLivro(cod_livro);
                     livro.setTitulo(livroNode.get("titulo").asString());
                     livro.setGenero(livroNode.get("genero").asString());
                     livro.setAutor(livroNode.get("autor").asString());
@@ -160,6 +163,7 @@ public class Livro {
                     livro.setQtdEstoque(livroNode.get("quantidade_estoque").asInt());
 
                     Editora editora = new Editora();
+                    editora.setCodEditora(cod_editora);
                     editora.setNomeEditora(editoraNode.get("nome").asString());
                     editora.setNomeContato(editoraNode.get("nome_contato").asString());
                     editora.setEmailEditora(editoraNode.get("email").asString());
@@ -167,6 +171,8 @@ public class Livro {
 
                     livro.editora = editora;
                     livros.add(livro);
+                    cod_livro++;
+                    cod_editora++;
                 }
             }
         } catch (Exception e) {
@@ -177,49 +183,82 @@ public class Livro {
     }
 
     public static boolean adicionarLivro(Livro livro, DataBaseConection banco) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        String dataPublicacaoFormatada = formatter.format(livro.getAnoPublicacao());
+
         try (Session session = banco.getSession()) {
-            String query = "CREATE (livro:Livro {titulo: '" + livro.getTitulo() + "', " +
-                    "genero: '" + livro.getGenero() + "', " +
-                    "autor: '" + livro.getAutor() + "', " +
-                    "isbn: " + livro.getIsbn() + ", " +
-                    "ano_publicacao: '" + livro.getAnoPublicacao().toString() + "', " +
-                    "preco: " + livro.getPreco() + ", " +
-                    "quantidade_estoque: " + livro.getQtdEstoque() + "})" +
-                    "-[:EDITORA]->(editora:Editora {nome: '" + livro.editora.getNomeEditora() + "', " +
+            // Verificar se a editora já existe
+            String verificaEditoraQuery = "MATCH (editora:Editora {nome: '" + livro.editora.getNomeEditora() + "', " +
                     "nome_contato: '" + livro.editora.getNomeContato() + "', " +
                     "email: '" + livro.editora.getEmailEditora() + "', " +
-                    "telefone: '" + livro.editora.getTelefoneEditora() + "'})";
+                    "telefone: '" + livro.editora.getTelefoneEditora() + "'}) RETURN editora";
 
-            session.writeTransaction(tx -> {
-                tx.run(query);
-                return null;
+            Record editoraExistente = session.readTransaction(tx -> {
+                Result result = tx.run(verificaEditoraQuery);
+                return result.single();
             });
 
-            return true;
+            if (editoraExistente == null) {
+                // Se a editora não existir, retornar falso
+                return false;
+            } else {
+                // Se a editora existe, criar o livro e associar a editora
+                String criaLivroQuery = "MATCH (editora:Editora {nome: '" + livro.editora.getNomeEditora() + "', " +
+                        "nome_contato: '" + livro.editora.getNomeContato() + "', " +
+                        "email: '" + livro.editora.getEmailEditora() + "', " +
+                        "telefone: '" + livro.editora.getTelefoneEditora() + "'}) " +
+                        "CREATE (livro:Livro {titulo: '" + livro.getTitulo() + "', " +
+                        "genero: '" + livro.getGenero() + "', " +
+                        "autor: '" + livro.getAutor() + "', " +
+                        "isbn: " + livro.getIsbn() + ", " +
+                        "ano_publicacao: '" + dataPublicacaoFormatada + "', " +
+                        "preco: " + livro.getPreco() + ", " +
+                        "quantidade_estoque: " + livro.getQtdEstoque() + "}) " +
+                        "CREATE (livro)-[:publicado_por]->(editora)";
+
+                session.writeTransaction(tx -> {
+                    tx.run(criaLivroQuery);
+                    return null;
+                });
+
+                return true;
+            }
         } catch (Exception e) {
             return false;
         }
     }
 
+
+
     public static boolean editarLivro(Livro livroAtualizado, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); // Formato para a data
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // Formato para a data
 
-            String query = "MATCH (livro:Livro {isbn: " + livroAtualizado.getIsbn() + "})-[:EDITORA]->(editora:Editora) " +
+            // Consulta para excluir o vínculo atual entre o livro e a editora
+            String excluirVinculoQuery = "MATCH (livro:Livro {isbn: " + livroAtualizado.getIsbn() + "})-[r:publicado_por]->(editora:Editora) " +
+                    "DELETE r";
+
+            // Consulta para criar novo vínculo entre o livro e a nova editora
+            String criarNovoVinculoQuery = "MATCH (livro:Livro {isbn: " + livroAtualizado.getIsbn() + "}), " +
+                    "(novaEditora:Editora {nome: '" + livroAtualizado.editora.getNomeEditora() + "', " +
+                    "nome_contato: '" + livroAtualizado.editora.getNomeContato() + "', " +
+                    "email: '" + livroAtualizado.editora.getEmailEditora() + "', " +
+                    "telefone: '" + livroAtualizado.editora.getTelefoneEditora() + "'}) " +
+                    "CREATE (livro)-[:publicado_por]->(novaEditora)";
+
+            // Consulta para atualizar os campos do livro
+            String atualizarCamposLivroQuery = "MATCH (livro:Livro {isbn: " + livroAtualizado.getIsbn() + "}) " +
                     "SET livro.titulo = '" + livroAtualizado.getTitulo() + "', " +
                     "    livro.genero = '" + livroAtualizado.getGenero() + "', " +
                     "    livro.autor = '" + livroAtualizado.getAutor() + "', " +
-                    "    livro.ano_publicacao = date('" + sdf.format(livroAtualizado.getAnoPublicacao()) + "'), " +
-                    "    livro.preco = " + livroAtualizado.getPreco() + ", " +
-                    "    livro.quantidade_estoque = " + livroAtualizado.getQtdEstoque() + ", " +
-                    "    editora.nome = '" + livroAtualizado.editora.getNomeEditora() + "', " +
-                    "    editora.nome_contato = '" + livroAtualizado.editora.getNomeContato() + "', " +
-                    "    editora.email = '" + livroAtualizado.editora.getEmailEditora() + "', " +
-                    "    editora.telefone = '" + livroAtualizado.editora.getTelefoneEditora() + "' " +
+                    "    livro.ano_publicacao = '" + sdf.format(livroAtualizado.getAnoPublicacao()) + "', " +
+                    "    livro.preco = " + livroAtualizado.getPreco() + " " +
                     "RETURN livro";
 
             List<Record> result = session.writeTransaction(tx -> {
-                Result resultSet = tx.run(query);
+                tx.run(excluirVinculoQuery);
+                tx.run(criarNovoVinculoQuery);
+                Result resultSet = tx.run(atualizarCamposLivroQuery);
                 return resultSet.list();
             });
 
@@ -237,20 +276,28 @@ public class Livro {
         }
     }
 
-
     public static boolean excluirLivro(Livro livroExcluir, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
-            String query = "MATCH (livro:Livro {isbn: " + livroExcluir.getIsbn() + "}) " +
-                    "OPTIONAL MATCH (livro)-[r:EDITORA]->() " +
-                    "DELETE livro, r";
+            String query1 = "MATCH (livro:Livro {isbn: " + livroExcluir.getIsbn() + "}) " +
+                    "MATCH (livro)-[r:publicado_por]->() " +
+                    "DELETE r";
 
+            String query2 = "MATCH (livro:Livro {isbn: " + livroExcluir.getIsbn() + "}) " +
+                    "DELETE livro";
+
+
+            System.out.println(query2);
+            System.out.println(query1);
             session.writeTransaction(tx -> {
-                tx.run(query);
+                tx.run(query1);
+                tx.run(query2);
                 return null;
             });
 
             return true;
         } catch (Exception e) {
+            System.out.println("Não foi possivel excluir este livro!");
+            System.out.println("Verifique se ele não possui alguma venda");
             return false;
         }
     }

@@ -67,31 +67,29 @@ public class Editora {
     }
     public static List<Editora> buscarEditoras(DataBaseConection banco) {
         List<Editora> editoras = new ArrayList<>();
+        int cod_editora = 1;
 
         try (Session session = banco.getSession()) {
-            String query = "MATCH (editora:Editora) RETURN editora.codEditora AS codEditora, " +
-                    "editora.nomeEditora AS nomeEditora, " +
-                    "editora.nomeContato AS nomeContato, " +
-                    "editora.email AS emailEditora, " +
-                    "editora.telefone AS telefoneEditora";
+            try (Transaction tx = session.beginTransaction()) {
+                String query = "MATCH (editora:Editora) RETURN editora";
+                Result result = tx.run(query);
 
-            List<Record> result = session.readTransaction(tx -> {
-                Result resultSet = tx.run(query);
-                return resultSet.list();
-            });
+                while (result.hasNext()) {
+                    Record record = result.next();
+                    Node editoraNode = record.get("editora").asNode();
 
-            for (Record record : result) {
-                Editora editora = new Editora();
-                editora.codEditora = record.get("codEditora").asInt();
-                editora.nomeEditora = record.get("nomeEditora").asString();
-                editora.nomeContato = record.get("nomeContato").asString();
-                editora.emailEditora = record.get("emailEditora").asString();
-                editora.telefoneEditora = record.get("telefoneEditora").asString();
-                editoras.add(editora);
+                    Editora editora = new Editora();
+                    editora.codEditora = cod_editora;
+                    editora.nomeEditora = editoraNode.get("nome").asString();
+                    editora.nomeContato = editoraNode.get("nome_contato").asString();
+                    editora.emailEditora = editoraNode.get("email").asString();
+                    editora.telefoneEditora = editoraNode.get("telefone").asString();
+                    editoras.add(editora);
+                    cod_editora ++;
+                }
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Erro ao buscar Editoras: " + e.getMessage());
         }
 
         return editoras;

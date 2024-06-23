@@ -145,6 +145,7 @@ public class MainTeste {
                     for (Editora editora : editoras) {
                         if (editora.getCodEditora() == escolhaEditora) {
                             hasEditora = true;
+                            novoLivro.editora = editora;
                             break;
                         }
                     }
@@ -153,7 +154,7 @@ public class MainTeste {
                         System.out.println("Código da Editora inválido!");
                         break;
                     }
-                    novoLivro.setCodEditora(escolhaEditora);
+
 
                     System.out.print("Quantidade em estoque: ");
                     int qtd = -1;
@@ -229,11 +230,6 @@ public class MainTeste {
                                     }
                                     break;
                                 case 4:
-                                    System.out.print("Novo ISBN: ");
-                                    long novoISBN = Long.parseLong(scanner.nextLine());
-                                    livroEditar.setIsbn(novoISBN);
-                                    break;
-                                case 5:
                                     String data = "";
                                     do{
                                         System.out.print("Novo Ano de Publicação (DD/MM/AAAA): ");
@@ -249,7 +245,7 @@ public class MainTeste {
 
                                     livroEditar.setAnoPublicacao(sqlDate);
                                     break;
-                                case 6:
+                                case 5:
                                     System.out.print("Novo Preço (9.99): ");
                                     String preco = "";
                                     do{
@@ -262,7 +258,7 @@ public class MainTeste {
 
                                     livroEditar.setPreco(Double.parseDouble(preco));
                                     break;
-                                case 7:
+                                case 6:
                                     System.out.println("Editoras Disponíveis: ");
                                     List<Editora> editoras = Editora.buscarEditoras(banco);
                                     System.out.println("0 | Voltar ao Menu Inicial");
@@ -278,6 +274,7 @@ public class MainTeste {
                                     for (Editora editora : editoras) {
                                         if (editora.getCodEditora() == escolhaEditora) {
                                             hasEditora = true;
+                                            livroEditar.editora = editora;
                                             break;
                                         }
                                     }
@@ -287,7 +284,6 @@ public class MainTeste {
                                         break;
                                     }
 
-                                    livroEditar.setCodEditora(escolhaEditora);
                                     break;
                                 default:
                                     System.out.println("Opção inválida. Voltando ao menu anterior...");

@@ -40,6 +40,10 @@ public class DataBaseConection {
     }
 
     public Session getSession() {
+        closeConnection();
+        driver = GraphDatabase.driver(uri, AuthTokens.basic(username, password));
+        session = driver.session();
         return session;
     }
+
 }
