@@ -385,16 +385,6 @@ public class MainTeste {
                         boolean editar = true;
                         switch (escolha) {
                             case 1:
-                                System.out.print("Novo Nome da Editora: ");
-                                String novoNome = scanner.nextLine();
-                                if (!novoNome.isEmpty()) {
-                                    editoraEditar.setNomeEditora(novoNome);
-                                } else {
-                                    System.out.println("Nome da Editora não pode ser vazio. Operação cancelada.");
-                                    editar = false;
-                                }
-                                break;
-                            case 2:
                                 System.out.print("Novo Nome do Contato: ");
                                 String novoContato = scanner.nextLine();
                                 if (!novoContato.isEmpty()) {
@@ -404,7 +394,7 @@ public class MainTeste {
                                     editar = false;
                                 }
                                 break;
-                            case 3:
+                            case 2:
                                 System.out.print("Novo Email da Editora: ");
                                 String novoEmail = scanner.nextLine();
                                 if (!novoEmail.isEmpty() && novoEmail.contains("@") && novoEmail.length() < 100) {
@@ -414,7 +404,7 @@ public class MainTeste {
                                     editar = false;
                                 }
                                 break;
-                            case 4:
+                            case 3:
                                 System.out.print("Novo Telefone da Editora '(XX) XXXX-XXXX': ");
                                 String novoTelefone = scanner.nextLine();
                                 if (!novoTelefone.isEmpty() && novoTelefone.matches("\\(\\d{2}\\)\\s\\d{4,5}-\\d{4}")) {

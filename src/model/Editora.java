@@ -59,11 +59,10 @@ public class Editora {
     }
 
     public void printEditoraSemFormatacao(){
-        System.out.println("Editora: " + codEditora);
-        System.out.println("1. Nome da Editora:     " + nomeEditora);
-        System.out.println("2. Nome do Contato:     " + nomeContato);
-        System.out.println("3. Email da Editora:    " + emailEditora);
-        System.out.println("4. Telefone da Editora: " + telefoneEditora);
+        System.out.println("Editora: " + codEditora + " | " + nomeEditora);
+        System.out.println("1. Nome do Contato:     " + nomeContato);
+        System.out.println("2. Email da Editora:    " + emailEditora);
+        System.out.println("3. Telefone da Editora: " + telefoneEditora);
     }
     public static List<Editora> buscarEditoras(DataBaseConection banco) {
         List<Editora> editoras = new ArrayList<>();
@@ -97,10 +96,10 @@ public class Editora {
 
     public static boolean editarEditora(Editora editora, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
-            String query = "MATCH (editora:Editora {email: '" + editora.getEmailEditora() + "'}) " +
-                    "SET editora.nome_editora = '" + editora.getNomeEditora() + "', " +
-                    "    editora.nome_contato = '" + editora.getNomeContato() + "', " +
-                    "    editora.telefone = '" + editora.getTelefoneEditora() + "' " +
+            String query = "MATCH (editora:Editora {nome: '" + editora.getNomeEditora() + "'}) " +
+                    "SET editora.nome_contato = '" + editora.getNomeContato() + "', " +
+                    "    editora.telefone = '" + editora.getTelefoneEditora() + "', " +
+                    "    editora.email = '" + editora.getEmailEditora() + "' " +
                     "RETURN editora";
 
             List<Record> result = session.writeTransaction(tx -> {
@@ -144,7 +143,7 @@ public class Editora {
     public static boolean excluirEditora(Editora editora, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
             // Verificar se existem livros associados à editora
-            String queryVerificarLivros = "MATCH (livro:Livro)-[:EDITORA]->(editora:Editora {nome: '" + editora.getNomeEditora() + "'}) RETURN livro";
+            String queryVerificarLivros = "MATCH (livro:Livro)-[:publicado_por]->(editora:Editora {nome: '" + editora.getNomeEditora() + "'}) RETURN livro";
 
             List<Record> livrosAssociados = session.readTransaction(tx -> {
                 Result result = tx.run(queryVerificarLivros);
