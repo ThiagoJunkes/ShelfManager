@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Endereco {
-    private int codEndereco;
+    private long codEndereco;
     private String rua;
     private String cidade;
     private String estado;
@@ -19,11 +19,11 @@ public class Endereco {
     private String complemento;
 
     // Getters e Setters
-    public int getCodEndereco() {
+    public long getCodEndereco() {
         return codEndereco;
     }
 
-    public void setCodEndereco(int codEndereco) {
+    public void setCodEndereco(long codEndereco) {
         this.codEndereco = codEndereco;
     }
 
@@ -71,7 +71,7 @@ public class Endereco {
         boolean sucesso = false;
 
         try (Session session = banco.getSession()) {
-            String query = "MATCH (e:Endereco {cod_endereco: " + endereco.getCodEndereco() + "}) " +
+            String query = "MATCH (e:Endereco {cpf_morador: " + endereco.getCodEndereco() + "}) " +
                     "SET e.rua = '" + endereco.getRua() + "', " +
                     "    e.cidade = '" + endereco.getCidade() + "', " +
                     "    e.estado = '" + endereco.getEstado() + "', " +
@@ -91,7 +91,6 @@ public class Endereco {
                 System.out.println("Nenhum endereço atualizado.");
             }
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Falha ao atualizar endereço.");
         }
 

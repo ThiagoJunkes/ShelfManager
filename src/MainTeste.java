@@ -92,7 +92,7 @@ public class MainTeste {
                     while (!cpf.matches("^\\d{11}$")) {
                         System.out.println("CPF inválido! Deve conter 11 dígitos.");
                         System.out.print("CPF (somente digito): ");
-                        scanner.nextLine().trim();
+                        cpf = scanner.nextLine().trim();
                     }
                     novoCliente.setCpf(Long.parseLong(cpf));
 

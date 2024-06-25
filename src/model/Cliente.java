@@ -10,6 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 public class Cliente {
     private int codCliente;
@@ -149,12 +152,13 @@ public class Cliente {
 
     public static List<Cliente> buscarClientes(DataBaseConection banco){
         List<Cliente> clientes = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY");
 
         try (Session session = banco.getSession()) {
-            String query = "MATCH (cliente:Cliente)-[:mora_em]->(endereco:Endereco) RETURN cliente, endereco ORDER BY cliente.cpf";
+            String query = "MATCH (cliente:Cliente)-[:mora_em]->(endereco:Endereco) return cliente, endereco";
             try (Transaction tx = session.beginTransaction()) {
                 Result result = tx.run(query);
+                int cod_cliente = 1;
 
                 while (result.hasNext()) {
                     Record record = result.next();
@@ -164,14 +168,15 @@ public class Cliente {
                     Cliente cliente = new Cliente();
                     Endereco endereco = new Endereco();
 
-                    cliente.setCodCliente(clienteNode.get("codCliente").asInt());
+                    cliente.setCodCliente(cod_cliente);
                     cliente.setNome(clienteNode.get("nome").asString());
                     cliente.setSobrenome(clienteNode.get("sobrenome").asString());
-                    cliente.setCpf(clienteNode.get("cpf").asLong());
+                    cliente.setCpf(Long.parseLong(clienteNode.get("cpf").asString()));
                     cliente.setEmailCliente(clienteNode.get("email").asString());
                     cliente.setTelefoneCliente(clienteNode.get("telefone").asString());
                     cliente.setDataCadastro(sdf.parse(clienteNode.get("data_cadastro").asString()));
 
+                    endereco.setCodEndereco(Long.parseLong(enderecoNode.get("cpf_morador").asString()));
                     endereco.setRua(enderecoNode.get("rua").asString());
                     endereco.setCidade(enderecoNode.get("cidade").asString());
                     endereco.setEstado(enderecoNode.get("estado").asString());
@@ -179,6 +184,7 @@ public class Cliente {
                     endereco.setComplemento(enderecoNode.get("complemento").asString());
                     cliente.endereco = endereco;
                     clientes.add(cliente);
+                    cod_cliente++;
                 }
             }
         }catch (Exception e) {
@@ -190,19 +196,24 @@ public class Cliente {
 
     public static boolean adicionarCliente(Cliente cliente, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
+            LocalDate dataAtual = LocalDate.now();
+            DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String dataFormatada = dataAtual.format(formatador);
+
             // Cria a query para adicionar Cliente e Endereço
             String query = "CREATE (endereco:Endereco {rua: '" + cliente.endereco.getRua() + "', " +
                     "cidade: '" + cliente.endereco.getCidade() + "', " +
                     "estado: '" + cliente.endereco.getEstado() + "', " +
+                    "cpf_morador: '" + cliente.getCpf() + "', " +
                     "cep: " + cliente.endereco.getCep() + ", " +
                     "complemento: '" + cliente.endereco.getComplemento() + "'}) " +
                     "CREATE (cliente:Cliente {nome: '" + cliente.getNome() + "', " +
                     "sobrenome: '" + cliente.getSobrenome() + "', " +
-                    "cpf: " + cliente.getCpf() + ", " +
+                    "cpf: '" + cliente.getCpf() + "', " +
                     "email: '" + cliente.getEmailCliente() + "', " +
                     "telefone: '" + cliente.getTelefoneCliente() + "', " +
-                    "data_cadastro: '" + cliente.getDataCadastro().toString() + "'}) " +
-                    "CREATE (cliente)-[:MORA_EM]->(endereco)";
+                    "data_cadastro: '" + dataFormatada + "'}) " +
+                    "CREATE (cliente)-[:mora_em]->(endereco)";
 
             // Executa a query em uma transação
             session.writeTransaction(tx -> {
