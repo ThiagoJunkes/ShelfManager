@@ -230,7 +230,7 @@ public class Cliente {
 
     public static boolean excluirCliente(Cliente clienteExcluir, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
-            String verificarComprasQuery = "MATCH (cliente:Cliente {cpf: " + clienteExcluir.getCpf() + "})-[:REALIZOU_COMPRA]->(venda:Venda) RETURN venda";
+            String verificarComprasQuery = "MATCH (cliente:Cliente {cpf: '" + clienteExcluir.getCpf() + "'})<-[:FEITA_POR]-(venda:Venda) RETURN venda";
 
             boolean possuiCompras = session.readTransaction(tx -> tx.run(verificarComprasQuery).hasNext());
 
@@ -238,12 +238,17 @@ public class Cliente {
                 System.out.println("Não é possível excluir o cliente pois ele já realizou uma compra.");
                 return false;
             } else {
-                String query = "MATCH (cliente:Cliente {cpf: " + clienteExcluir.getCpf() + "}) " +
-                        "OPTIONAL MATCH (cliente)-[r:MORA_EM]->(endereco:Endereco) " +
-                        "DELETE cliente, r, endereco";
+                String query = "MATCH (cliente:Cliente {cpf: '" + clienteExcluir.getCpf() + "'}) " +
+                        "MATCH (cliente)-[r:mora_em]->(endereco:Endereco) " +
+                        "DELETE  r";
+
+                String query1 = "MATCH (cliente:Cliente {cpf: '" + clienteExcluir.getCpf() + "'}) " +
+                        "MATCH (endereco:Endereco {cpf_morador: '" + clienteExcluir.getCpf() + "'}) " +
+                        "DELETE cliente";
 
                 session.writeTransaction(tx -> {
                     tx.run(query);
+                    tx.run(query1);
                     return null;
                 });
 
