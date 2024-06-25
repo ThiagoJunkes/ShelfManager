@@ -209,6 +209,17 @@ public class Livro {
                 // Se a editora não existir, retornar falso
                 return false;
             } else {
+                // Query para verificar se já existe um livro com o mesmo isbn
+                String checkQuery = "MATCH (e:Livro {isbn: " + livro.getIsbn() + "}) RETURN e";
+                boolean livroExiste = session.readTransaction(tx -> {
+                    Result result = tx.run(checkQuery);
+                    return result.hasNext();
+                });
+
+                if (livroExiste) {
+                    System.out.println("Não foi possível adicionar o livro pois já existe um com o mesmo ISBN!");
+                    return false;
+                }
                 // Se a editora existe, criar o livro e associar a editora
                 String criaLivroQuery = "MATCH (editora:Editora {nome: '" + livro.editora.getNomeEditora() + "', " +
                         "nome_contato: '" + livro.editora.getNomeContato() + "', " +

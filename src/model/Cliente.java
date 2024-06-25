@@ -196,6 +196,19 @@ public class Cliente {
 
     public static boolean adicionarCliente(Cliente cliente, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
+            // Query para verificar se já existe um cliente com o mesmo cpf
+            String checkQuery = "MATCH (e:Cliente {cpf: '" + cliente.getCpf() + "'}) RETURN e";
+            boolean editoraExiste = session.readTransaction(tx -> {
+                Result result = tx.run(checkQuery);
+                return result.hasNext();
+            });
+
+            if (editoraExiste) {
+                System.out.println("Não foi possível adicionar o cliente pois o CPF já está cadastrado!");
+                return false;
+            }
+
+
             LocalDate dataAtual = LocalDate.now();
             DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             String dataFormatada = dataAtual.format(formatador);

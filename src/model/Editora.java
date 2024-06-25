@@ -122,6 +122,19 @@ public class Editora {
 
     public static boolean adicionarEditora(Editora editora, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
+
+            // Query para verificar se já existe uma editora com o mesmo nome
+            String checkQuery = "MATCH (e:Editora {nome: '" + editora.getNomeEditora() + "'}) RETURN e";
+            boolean editoraExiste = session.readTransaction(tx -> {
+                Result result = tx.run(checkQuery);
+                return result.hasNext();
+            });
+
+            if (editoraExiste) {
+                System.out.println("Não foi possível adicionar a editora pois já existe uma com esse nome!");
+                return false;
+            }
+
             String query = "CREATE (editora:Editora {nome: '" + editora.getNomeEditora() + "', " +
                     "nome_contato: '" + editora.getNomeContato() + "', " +
                     "email: '" + editora.getEmailEditora() + "', " +

@@ -115,7 +115,7 @@ public class Menu {
             String isbn = String.valueOf(livro.getIsbn());
             String anoPublicacao = dateFormat.format(livro.getAnoPublicacao());
             String preco = String.valueOf(livro.getPreco());
-            String codEditora = String.valueOf(livro.getCodEditora());
+            String codEditora = String.valueOf(livro.editora.getCodEditora());
             String nomeEditora = livro.editora.getNomeEditora().length() > 25 ? livro.editora.getNomeEditora().substring(0, 25) : livro.editora.getNomeEditora();
 
             System.out.printf("| %-8d | %-23s | %-20s | %-15s | %-15s | %-15s | %-8s | %-11s | %-23s |\n",
