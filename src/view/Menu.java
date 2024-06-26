@@ -164,9 +164,9 @@ public class Menu {
                 primeiraLinha = false;
             }
 
-            String precoLivro = "R$" + String.valueOf(venda.livro.getPreco());
+            String precoLivro = "R$";// + String.valueOf(venda.livro.getPreco());
             String qtdLivros = String.valueOf(venda.getQtdLivros());
-            String tituloLivro = venda.livro.getTitulo();
+            String tituloLivro = "";//venda.livro.getTitulo();
             tituloLivro = tituloLivro.length() > 46 ? tituloLivro.substring(0, 43) + "..." : tituloLivro;
 
             System.out.printf("| %-14s | %-8s | %-46s |\n", precoLivro, qtdLivros, tituloLivro);

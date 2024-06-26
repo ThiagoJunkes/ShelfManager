@@ -11,8 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="32c97c09-6cb3-43fc-9e7f-b8d0fe87f2a9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Editora.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Editora.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Livro.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Livro.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MainTeste.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainTeste.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/ItemVenda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/ItemVenda.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/view/Menu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/Menu.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -114,7 +114,7 @@
       <workItem from="1719095769844" duration="3478000" />
       <workItem from="1719165688016" duration="8774000" />
       <workItem from="1719266587193" duration="7063000" />
-      <workItem from="1719354290096" duration="1092000" />
+      <workItem from="1719354290096" duration="6558000" />
     </task>
     <servers />
   </component>
@@ -130,14 +130,9 @@
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/model/Cliente.java</url>
-          <line>231</line>
-          <option name="timeStamp" value="23" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/model/Livro.java</url>
-          <line>212</line>
-          <option name="timeStamp" value="25" />
+          <url>file://$PROJECT_DIR$/src/model/ItemVenda.java</url>
+          <line>137</line>
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

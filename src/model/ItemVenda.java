@@ -1,9 +1,12 @@
 package model;
 
-import org.neo4j.driver.Driver;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
+import org.neo4j.driver.Transaction;
 import org.neo4j.driver.Values;
 import org.neo4j.driver.exceptions.ClientException;
+import org.neo4j.driver.types.Node;
 
 import dao.DataBaseConection;
 
@@ -17,7 +20,7 @@ public class ItemVenda {
     private int codLivro;
     private int qtdLivros;
 
-    public Livro livro;
+    public List<Livro> livros;
     public Venda venda;
     public Cliente cliente;
 
@@ -48,14 +51,6 @@ public class ItemVenda {
         this.qtdLivros = qtdLivros;
     }
 
-    public Livro getLivro() {
-        return livro;
-    }
-
-    public void setLivro(Livro livro) {
-        this.livro = livro;
-    }
-
     public Venda getVenda() {
         return venda;
     }
@@ -64,18 +59,10 @@ public class ItemVenda {
         this.venda = venda;
     }
 
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
     public void printItemVendaFormatado() {
         System.out.println("-------------------------------------------------");
         System.out.println("Código Livro: " + codLivro);
-        System.out.println("  Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
+        //System.out.println("  Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
         System.out.println("  Quantidade: " + qtdLivros);
         System.out.println("  Metodo de Pagamento: " + venda.getMetodoPag());
         System.out.println("  Cliente: " + cliente.getNome() + " " + cliente.getSobrenome() + " CPF: " + cliente.getCpf());
@@ -87,7 +74,7 @@ public class ItemVenda {
 
         System.out.println("Venda: " + codPedido);
         System.out.println("1 - Código Livro:        " + codLivro);
-        System.out.println("Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
+        //System.out.println("Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
         System.out.println("2 - Quantidade:          " + qtdLivros);
         System.out.println("3 - Metodo de Pagamento: " + venda.getMetodoPag());
         System.out.println("4 - Data da Venda:       " + dataFormatada);
@@ -97,66 +84,67 @@ public class ItemVenda {
 
     public static List<ItemVenda> buscarItensVenda(DataBaseConection banco) {
         List<ItemVenda> itensVendas = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        try {
-            Session session = banco.getSession();
+        try (Session session = banco.getSession()) {
+            // Query para buscar todas as vendas com seus livros e clientes
+            String query = "MATCH (v:Venda)-[:vendido]->(l:Livro), (v)-[:FEITA_POR]->(c:Cliente) " +
+                    "RETURN v, collect(l) AS livros, c";
+            try(Transaction tx = session.beginTransaction()){
+                Result result = tx.run(query);
 
-            // Query para buscar todos os itens de venda
-            String query = "MATCH (v:Venda)-[:CONTEM]->(l:Livro)<-[:FEZ]-(c:Cliente) RETURN v, l, c";
-            var result = session.run(query);
+                while (result.hasNext()) {
+                    Record record = result.next();
 
-            while (result.hasNext()) {
-                var record = result.next();
+                    Venda venda = new Venda();
+                    venda.setCodVenda(record.get("v").asNode().get("codigo").asInt());
+                    venda.setValorVenda(record.get("v").asNode().get("valor").asDouble());
+                    venda.setMetodoPag(record.get("v").asNode().get("metodo_pag").asString());
+                    venda.setDataVenda((record.get("v").asNode().get("data").asString()));
+                    // Atribua outros campos de Venda conforme necessário
 
-                ItemVenda itemVenda = new ItemVenda();
-                Venda venda = new Venda();
-                Livro livro = new Livro();
-                Cliente cliente = new Cliente();
+                    List<Livro> livros = new ArrayList<>();
+                    for (Object livroObject  : record.get("livros").asList()) {
+                        Node livroNode = (Node) livroObject;
+                        Livro livro = new Livro();
 
-                // Preenchendo dados da venda
-                venda.setCodVenda(record.get("v").asNode().get("cod_venda").asInt());
-                venda.setMetodoPag(record.get("v").asNode().get("metodo_pag").asString());
-                // Atribua outros campos de Venda conforme necessário
+                        livro.setTitulo(livroNode.get("titulo").asString());
+                        livro.setGenero(livroNode.get("genero").asString());
+                        livro.setAutor(livroNode.get("autor").asString());
+                        livro.setIsbn(livroNode.get("isbn").asLong());
+                        livro.setPreco(livroNode.get("preco").asDouble());
+                        livro.setAnoPublicacao(sdf.parse(livroNode.get("ano_publicacao").asString()));
 
-                // Preenchendo dados do livro
-                livro.setCodLivro(record.get("l").asNode().get("cod_livro").asInt());
-                livro.setTitulo(record.get("l").asNode().get("titulo").asString());
-                livro.setGenero(record.get("l").asNode().get("genero").asString());
-                livro.setAutor(record.get("l").asNode().get("autor").asString());
-                livro.setIsbn(record.get("l").asNode().get("isbn").asLong());
-                livro.setAnoPublicacao(Date.valueOf(record.get("l").asNode().get("ano_publicacao").asLocalDate()));
-                livro.setPreco(record.get("l").asNode().get("preco").asDouble());
-                // Atribua outros campos de Livro conforme necessário
+                        // Atribua outros campos de Livro conforme necessário
+                        livros.add(livro);
+                    }
 
-                // Preenchendo dados do cliente
-                cliente.setCodCliente(record.get("c").asNode().get("cod_cliente").asInt());
-                cliente.setNome(record.get("c").asNode().get("nome").asString());
-                cliente.setSobrenome(record.get("c").asNode().get("sobrenome").asString());
-                cliente.setCpf(record.get("c").asNode().get("cpf").asLong());
-                cliente.setEmailCliente(record.get("c").asNode().get("email_cliente").asString());
-                cliente.setTelefoneCliente(record.get("c").asNode().get("telefone_cliente").asString());
-                cliente.setDataCadastro(Date.valueOf(record.get("c").asNode().get("data_cadastro").asLocalDate()));
-                // Atribua outros campos de Cliente conforme necessário
+                    Cliente cliente = new Cliente();
+                    cliente.setNome(record.get("c").asNode().get("nome").asString());
+                    cliente.setSobrenome(record.get("c").asNode().get("sobrenome").asString());
+                    cliente.setCpf(Long.parseLong(record.get("c").asNode().get("cpf").asString()));
+                    cliente.setEmailCliente(record.get("c").asNode().get("email").asString());
+                    cliente.setTelefoneCliente(record.get("c").asNode().get("telefone").asString());
+                    cliente.setDataCadastro(sdf.parse(record.get("c").asNode().get("data_cadastro").asString()));
+                    // Atribua outros campos de Cliente conforme necessário
 
-                itemVenda.setCodPedido((int) venda.getCodVenda());
-                itemVenda.setCodLivro(livro.getCodLivro());
-                itemVenda.setQtdLivros(1); // Exemplo, ajuste conforme sua lógica
-                itemVenda.setVenda(venda);
-                itemVenda.setLivro(livro);
-                itemVenda.setCliente(cliente);
+                    ItemVenda itemVenda = new ItemVenda();
+                    itemVenda.setCodPedido((int) venda.getCodVenda());
+                    itemVenda.setVenda(venda);
+                    itemVenda.livros = livros;
+                    itemVenda.cliente = cliente;
+                    itemVenda.setQtdLivros(livros.size()); // Ajuste conforme sua lógica
 
-                itensVendas.add(itemVenda);
+                    itensVendas.add(itemVenda);
+                }
             }
-
-            session.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Falha ao buscar Vendas!");
         }
 
         return itensVendas;
     }
-
-    public static void editarItemVenda(DataBaseConection banco, ItemVenda itemVenda) {
+    public static void editarItemVenda(DataBaseConection banco, ItemVenda itemVenda, int remover) {
         try {
             Session session = banco.getSession();
 
@@ -166,7 +154,7 @@ public class ItemVenda {
                     "SET r.qtdLivros = $qtdLivros";
             session.run(query, Values.parameters(
                     "codPedido", itemVenda.getVenda().getCodVenda(),
-                    "codLivro", itemVenda.getLivro().getCodLivro(),
+                    //"codLivro", itemVenda.getLivro().getCodLivro(),
                     "qtdLivros", itemVenda.getQtdLivros()
             ));
 
@@ -186,8 +174,8 @@ public class ItemVenda {
                     "WHERE ID(v) = $codPedido AND ID(l) = $codLivro " +
                     "DELETE r";
             session.run(query, Values.parameters(
-                    "codPedido", itemVenda.getVenda().getCodVenda(),
-                    "codLivro", itemVenda.getLivro().getCodLivro()
+                    "codPedido", itemVenda.getVenda().getCodVenda() //,
+                    //"codLivro", itemVenda.getLivro().getCodLivro()
             ));
 
             session.close();
