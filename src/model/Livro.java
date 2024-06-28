@@ -119,8 +119,8 @@ public class Livro {
         String tituloFormatado = titulo.length() > 20 ? titulo.substring(0, 20) : titulo;
         String editoraFormatada = editora.getNomeEditora().length() > 20 ? editora.getNomeEditora().substring(0, 20) : editora.getNomeEditora();
 
-        System.out.printf("%-20s | %-20s | %-20s | %-20s\n",
-                tituloFormatado, genero, editoraFormatada, isbn);
+        System.out.printf("%-5d | %-20s | %-20s | %-20s | %-20s\n",
+                codLivro, tituloFormatado, genero, editoraFormatada, isbn);
     }
 
     public void printEstoqueSemFormatacaoEstoque(){

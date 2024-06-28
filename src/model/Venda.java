@@ -6,8 +6,11 @@ import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.neo4j.driver.TransactionWork;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Venda {
     private long codVenda;
@@ -65,43 +68,23 @@ public class Venda {
         this.codCliente = codCliente;
     }
 
-    public static List<Venda> buscarVendas(DataBaseConection banco){
-        List<Venda> vendas = new ArrayList<>();
-
+    public static void adicionarItemVenda(DataBaseConection banco, ItemVenda vendaRealizada) {
         try (Session session = banco.getSession()) {
-            String cypherQuery = "MATCH (v:Venda)-[:FEITA_POR]->(c:Cliente) RETURN v, c";
-            Result result = session.run(cypherQuery);
-
-            while (result.hasNext()) {
-                var record = result.next();
-                var vendaNode = record.get("v").asNode();
-                var clienteNode = record.get("c").asNode();
-
-                Venda venda = new Venda();
-                venda.codVenda = vendaNode.get("codVenda").asLong();
-                venda.valorVenda = vendaNode.get("valor").asDouble();
-                venda.dataVenda = vendaNode.get("data").asString();
-                venda.metodoPag = vendaNode.get("metodo_pag").asString();
-                venda.codCliente = clienteNode.get("cpf").asString();
-
-                vendas.add(venda);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return vendas;
-    }
-
-    public static void adicionarItemVenda(DataBaseConection banco, String codCliente, int metodoPag, double precoTotal, List<String> livros){
-        try (Session session = banco.getSession()) {
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String formattedDate = currentDate.format(formatter);
             session.writeTransaction(new TransactionWork<Void>() {
                 @Override
                 public Void execute(Transaction tx) {
+                    String buscaCodigoQuery = "MATCH (v:Venda) RETURN MAX(v.codigo) AS maxCodVenda";
+                    Result buscaResult = tx.run(buscaCodigoQuery);
+                    int novoCod = buscaResult.single().get("maxCodVenda").asInt() + 1;
+
                     // Criar a venda
                     String createVendaQuery = String.format(
-                            "CREATE (v:Venda {valor: %.2f, data: date(), metodo_pag: '%s'}) RETURN id(v) AS codVenda",
-                            precoTotal, Venda.metodosPagamento[metodoPag - 1]
+                            Locale.US,
+                            "CREATE (v:Venda {codigo: %d, valor: %.2f, data: '%s', metodo_pag: '%s'}) RETURN v.codigo AS codVenda",
+                            novoCod, vendaRealizada.venda.getValorVenda(), formattedDate, vendaRealizada.venda.getMetodoPag()
                     );
 
                     Result vendaResult = tx.run(createVendaQuery);
@@ -109,24 +92,25 @@ public class Venda {
 
                     // Relacionar a venda com o cliente
                     String relateVendaClienteQuery = String.format(
-                            "MATCH (c:Cliente {cpf: '%s'}), (v:Venda {valor: %.2f}) CREATE (v)-[:FEITA_POR]->(c)",
-                            codCliente, precoTotal
+                            "MATCH (c:Cliente {cpf: '%s'}), (v:Venda {codigo: %d}) CREATE (v)-[:FEITA_POR]->(c)",
+                            vendaRealizada.cliente.getCpf(), codVenda
                     );
                     tx.run(relateVendaClienteQuery);
 
                     // Relacionar a venda com os livros
-                    for (String livro : livros) {
-                        String[] itens = livro.split("\\|");
-                        String titulo = itens[0];
-                        int qtd = Integer.parseInt(itens[1]);
-
+                    for (Livro livro : vendaRealizada.livros) {
                         String relateVendaLivroQuery = String.format(
-                                "MATCH (l:Livro {titulo: '%s'}), (v:Venda {valor: %.2f}) CREATE (v)-[:vendido]->(l)",
-                                titulo, precoTotal
+                                "MATCH (l:Livro {isbn: '%s'}), (v:Venda {codigo: %d}) CREATE (v)-[:vendido]->(l)",
+                                livro.getIsbn(), codVenda
                         );
                         tx.run(relateVendaLivroQuery);
 
-                        // Atualizar a quantidade no estoque (não implementado)
+                        // Atualizar a quantidade no estoque
+                        String updateEstoqueQuery = String.format(
+                                "MATCH (l:Livro {isbn: '%s'}) SET l.qtdEstoque = l.qtdEstoque - 1",
+                                livro.getIsbn()
+                        );
+                        tx.run(updateEstoqueQuery);
                     }
 
                     return null;
@@ -135,7 +119,7 @@ public class Venda {
 
             System.out.println("Venda registrada com sucesso!");
         } catch (Exception e) {
-            System.out.println("Não foi possivel registrar a venda!");
+            System.out.println("Não foi possível registrar a venda!");
             e.printStackTrace();
         }
     }

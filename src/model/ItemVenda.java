@@ -14,6 +14,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ItemVenda {
     private int codPedido;
@@ -25,6 +26,7 @@ public class ItemVenda {
     public Cliente cliente;
 
     public ItemVenda() {
+        livros = new ArrayList<>();
     }
 
     public int getCodPedido() {
@@ -88,8 +90,8 @@ public class ItemVenda {
 
         try (Session session = banco.getSession()) {
             // Query para buscar todas as vendas com seus livros e clientes
-            String query = "MATCH (v:Venda)-[:vendido]->(l:Livro), (v)-[:FEITA_POR]->(c:Cliente) " +
-                    "RETURN v, collect(l) AS livros, c";
+            String query = "MATCH (v:Venda)-[r:vendido]->(l:Livro), (v)-[:FEITA_POR]->(c:Cliente) " +
+                    "RETURN v, collect({livro: l, qtd: r.qtd}) AS livros, c";
             try(Transaction tx = session.beginTransaction()){
                 Result result = tx.run(query);
 
@@ -105,17 +107,19 @@ public class ItemVenda {
 
                     List<Livro> livros = new ArrayList<>();
                     for (Object livroObject  : record.get("livros").asList()) {
-                        Node livroNode = (Node) livroObject;
-                        Livro livro = new Livro();
+                        Map<String, Object> livroMap = (Map<String, Object>) livroObject;
+                        Node livroNode = (Node) livroMap.get("livro");
+                        long quantidade = (long) livroMap.get("qtd");
 
+                        Livro livro = new Livro();;
                         livro.setTitulo(livroNode.get("titulo").asString());
                         livro.setGenero(livroNode.get("genero").asString());
                         livro.setAutor(livroNode.get("autor").asString());
                         livro.setIsbn(livroNode.get("isbn").asLong());
                         livro.setPreco(livroNode.get("preco").asDouble());
                         livro.setAnoPublicacao(sdf.parse(livroNode.get("ano_publicacao").asString()));
+                        livro.setQtdEstoque((int) quantidade);
 
-                        // Atribua outros campos de Livro conforme necessário
                         livros.add(livro);
                     }
 

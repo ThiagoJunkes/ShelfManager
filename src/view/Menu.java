@@ -155,7 +155,7 @@ public class Menu {
                 System.out.println("------------------------------------------------------------------------------");
             for (Livro livro: venda.livros) {
                 String precoLivro = "R$" + livro.getPreco();
-                String qtdLivros = String.valueOf(venda.getQtdLivros());
+                String qtdLivros = String.valueOf(livro.getQtdEstoque());
                 String tituloLivro = livro.getTitulo();
                 tituloLivro = tituloLivro.length() > 46 ? tituloLivro.substring(0, 43) + "..." : tituloLivro;
 

@@ -773,6 +773,7 @@ public class MainTeste {
         System.out.println(" 0 - Menu Inicial | 1 - Adicionar Venda | 2 - Editar Venda | 3 - Excluir Venda ");
         System.out.print("Escolha uma opção: ");
         String escolhaVenda = scanner.nextLine();
+        ItemVenda cadastrarVenda = new ItemVenda();
         switch (escolhaVenda) {
             case "1":
                 List<Cliente> clientes = Cliente.buscarClientes(banco);
@@ -782,7 +783,7 @@ public class MainTeste {
                     cliente.printClienteFormatado();
                 }
                 boolean clienteValido = false;
-                int codCliente = 0;
+                long codCliente = 0;
 
                 while (!clienteValido){
                     try {
@@ -795,6 +796,7 @@ public class MainTeste {
                         for (Cliente cliente: clientes) {
                             if (cliente.getCodCliente() == codCliente) {
                                 clienteValido = true;
+                                cadastrarVenda.cliente = cliente;
                                 break;
                             }
                         }
@@ -815,12 +817,11 @@ public class MainTeste {
                 boolean livroValido = false;
                 int codLivro = 0;
                 float precoTotal = 0;
-                List<String> livrosVendidos = new ArrayList<>();
 
                 while(true){
                     try {
                         Livro escolha = new Livro();
-                        if(!livrosVendidos.isEmpty()) System.out.println("Digite -1 para não adicionar mais livros.");
+                        if(cadastrarVenda.livros.size() != 0) System.out.println("Digite -1 para não adicionar mais livros.");
                         System.out.println("Digite 0 para voltar ao Menu Inicial.");
                         System.out.print("Digite o código do livro vendido: ");
                         codLivro = Integer.parseInt(scanner.nextLine());
@@ -829,7 +830,7 @@ public class MainTeste {
                             livroValido = false;
                             break;
                         }
-                        if(!livrosVendidos.isEmpty() && codLivro == -1){ // Adiciona livros
+                        if(cadastrarVenda.livros.size() != 0 && codLivro == -1){ // Adiciona livros
                             break;
                         }
 
@@ -855,13 +856,16 @@ public class MainTeste {
                                 }
                             }
                             precoTotal += (qtdLivro * escolha.getPreco());
-                            livrosVendidos.add(codLivro + "|" + qtdLivro);
+                            escolha.setQtdEstoque(qtdLivro);
+                            cadastrarVenda.venda = new Venda();
+                            cadastrarVenda.venda.setValorVenda(precoTotal);
+                            cadastrarVenda.livros.add(escolha);
                         }
                     } catch (Exception e){
                         System.out.println("Código Inválido!");
                     }
                 }
-                if(!livroValido || livrosVendidos.isEmpty()) break;
+                if(!livroValido || cadastrarVenda.livros.size() == 0) break;
 
                 int metodoPag = 0;
                 while(metodoPag < 1){
@@ -879,7 +883,8 @@ public class MainTeste {
                         System.out.println("Valor Inválido!");
                     }
                 }
-                //Venda.adicionarItemVenda(banco, codCliente, metodoPag, precoTotal, livrosVendidos);
+                cadastrarVenda.venda.setMetodoPag(Venda.metodosPagamento[metodoPag-1]);
+                Venda.adicionarItemVenda(banco, cadastrarVenda);
                 break;
             case "2":
                 try{
