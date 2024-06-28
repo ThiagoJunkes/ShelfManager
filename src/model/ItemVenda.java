@@ -62,10 +62,13 @@ public class ItemVenda {
     }
 
     public void printItemVendaFormatado() {
-        System.out.println("-------------------------------------------------");
-        System.out.println("Código Livro: " + codLivro);
-        //System.out.println("  Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
-        System.out.println("  Quantidade: " + qtdLivros);
+        System.out.println("-|Venda: " + getCodPedido() + "|--------------------------------");
+        for (Livro livro: livros) {
+            System.out.println(" Código Livro: " + livro.getCodLivro());
+            System.out.println(" Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
+            System.out.println(" Quantidade: " + livro.getQtdEstoque());
+            System.out.println("-------------------------------------------");
+        }
         System.out.println("  Metodo de Pagamento: " + venda.getMetodoPag());
         System.out.println("  Cliente: " + cliente.getNome() + " " + cliente.getSobrenome() + " CPF: " + cliente.getCpf());
     }
@@ -75,13 +78,18 @@ public class ItemVenda {
         String dataFormatada = sdf.format(venda.getDataVenda());
 
         System.out.println("Venda: " + codPedido);
-        System.out.println("1 - Código Livro:        " + codLivro);
-        //System.out.println("Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
-        System.out.println("2 - Quantidade:          " + qtdLivros);
-        System.out.println("3 - Metodo de Pagamento: " + venda.getMetodoPag());
-        System.out.println("4 - Data da Venda:       " + dataFormatada);
-        System.out.println("5 - Código Cliente:      " + cliente.getCodCliente());
-        System.out.println("Cliente: " + cliente.getNome() + " " + cliente.getSobrenome() + " CPF: " + cliente.getCpf());
+        System.out.println("1 - Livros:        ");
+        for (Livro livro: livros) {
+            System.out.print("    Código Livro: " + livro.getCodLivro());
+            System.out.print("    Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
+            System.out.print("    Quantidade: " + livro.getQtdEstoque());
+            System.out.println("-------------------------------------------");
+        }
+        System.out.println("2 - Metodo de Pagamento: " + venda.getMetodoPag());
+        System.out.println("3 - Data da Venda:       " + dataFormatada);
+        System.out.println("4 - Código Cliente:      " + cliente.getCodCliente());
+        System.out.println("    Cliente: " + cliente.getNome() + " " + cliente.getSobrenome());
+        System.out.println("    CPF: " + cliente.getCpf());
     }
 
     public static List<ItemVenda> buscarItensVenda(DataBaseConection banco) {
@@ -173,17 +181,33 @@ public class ItemVenda {
         try {
             Session session = banco.getSession();
 
-            // Excluir relacionamento de venda com livro
-            String query = "MATCH (v:Venda)-[r:CONTEM]->(l:Livro) " +
-                    "WHERE ID(v) = $codPedido AND ID(l) = $codLivro " +
-                    "DELETE r";
-            session.run(query, Values.parameters(
-                    "codPedido", itemVenda.getVenda().getCodVenda() //,
-                    //"codLivro", itemVenda.getLivro().getCodLivro()
-            ));
+            // Iniciar uma transação
+            try (Transaction tx = session.beginTransaction()) {
+                // Excluir relacionamentos da venda com livros
+                String deleteRelationshipsQuery = "MATCH (v:Venda)-[r:vendido]->(l:Livro) " +
+                        "WHERE v.codigo = $codPedido " +
+                        "DELETE r";
+                tx.run(deleteRelationshipsQuery, Values.parameters("codPedido", itemVenda.getVenda().getCodVenda()));
+
+                // Excluir relacionamento da venda com o cliente
+                String deleteClientRelationshipQuery = "MATCH (v:Venda)-[r:FEITA_POR]->(c:Cliente) " +
+                        "WHERE v.codigo = $codPedido " +
+                        "DELETE r";
+                tx.run(deleteClientRelationshipQuery, Values.parameters("codPedido", itemVenda.getVenda().getCodVenda()));
+
+                // Excluir o nó da venda
+                String deleteVendaQuery = "MATCH (v:Venda) WHERE v.codigo = $codPedido DELETE v";
+                tx.run(deleteVendaQuery, Values.parameters("codPedido", itemVenda.getVenda().getCodVenda()));
+
+                // Confirmar a transação
+                tx.commit();
+
+                System.out.println("Item de venda excluído com sucesso!");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             session.close();
-            System.out.println("Item de venda excluído com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
         }
