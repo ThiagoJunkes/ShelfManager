@@ -73,48 +73,46 @@ public class Venda {
             LocalDate currentDate = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             String formattedDate = currentDate.format(formatter);
-            session.writeTransaction(new TransactionWork<Void>() {
-                @Override
-                public Void execute(Transaction tx) {
-                    String buscaCodigoQuery = "MATCH (v:Venda) RETURN MAX(v.codigo) AS maxCodVenda";
-                    Result buscaResult = tx.run(buscaCodigoQuery);
-                    int novoCod = buscaResult.single().get("maxCodVenda").asInt() + 1;
 
-                    // Criar a venda
-                    String createVendaQuery = String.format(
-                            Locale.US,
-                            "CREATE (v:Venda {codigo: %d, valor: %.2f, data: '%s', metodo_pag: '%s'}) RETURN v.codigo AS codVenda",
-                            novoCod, vendaRealizada.venda.getValorVenda(), formattedDate, vendaRealizada.venda.getMetodoPag()
+            session.writeTransaction(tx -> {
+                String buscaCodigoQuery = "MATCH (v:Venda) RETURN MAX(v.codigo) AS maxCodVenda";
+                Result buscaResult = tx.run(buscaCodigoQuery);
+                int novoCod = buscaResult.single().get("maxCodVenda").asInt() + 1;
+
+                // Criar a venda
+                String createVendaQuery = String.format(
+                        Locale.US,
+                        "CREATE (v:Venda {codigo: %d, valor: %.2f, data: '%s', metodo_pag: '%s'}) RETURN v.codigo AS codVenda",
+                        novoCod, vendaRealizada.venda.getValorVenda(), formattedDate, vendaRealizada.venda.getMetodoPag()
+                );
+
+                Result vendaResult = tx.run(createVendaQuery);
+                int codVenda = vendaResult.single().get("codVenda").asInt();
+
+                // Relacionar a venda com o cliente
+                String relateVendaClienteQuery = String.format(
+                        "MATCH (c:Cliente {cpf: '%s'}), (v:Venda {codigo: %d}) CREATE (v)-[:FEITA_POR]->(c)",
+                        vendaRealizada.cliente.getCpf(), codVenda
+                );
+                tx.run(relateVendaClienteQuery);
+
+                // Relacionar a venda com os livros
+                for (Livro livro : vendaRealizada.livros) {
+                    String relateVendaLivroQuery = String.format(
+                            "MATCH (l:Livro {isbn: %s}), (v:Venda {codigo: %d}) CREATE (v)-[:vendido {qtd: %d}]->(l)",
+                            livro.getIsbn(), codVenda, livro.getQtdEstoque()
                     );
+                    tx.run(relateVendaLivroQuery);
 
-                    Result vendaResult = tx.run(createVendaQuery);
-                    int codVenda = vendaResult.single().get("codVenda").asInt();
-
-                    // Relacionar a venda com o cliente
-                    String relateVendaClienteQuery = String.format(
-                            "MATCH (c:Cliente {cpf: '%s'}), (v:Venda {codigo: %d}) CREATE (v)-[:FEITA_POR]->(c)",
-                            vendaRealizada.cliente.getCpf(), codVenda
+                    // Atualizar a quantidade no estoque
+                    String updateEstoqueQuery = String.format(
+                            "MATCH (l:Livro {isbn: %s}) SET l.qtdEstoque = l.qtdEstoque - %d",
+                            livro.getIsbn(), livro.getQtdEstoque()
                     );
-                    tx.run(relateVendaClienteQuery);
-
-                    // Relacionar a venda com os livros
-                    for (Livro livro : vendaRealizada.livros) {
-                        String relateVendaLivroQuery = String.format(
-                                "MATCH (l:Livro {isbn: '%s'}), (v:Venda {codigo: %d}) CREATE (v)-[:vendido]->(l)",
-                                livro.getIsbn(), codVenda
-                        );
-                        tx.run(relateVendaLivroQuery);
-
-                        // Atualizar a quantidade no estoque
-                        String updateEstoqueQuery = String.format(
-                                "MATCH (l:Livro {isbn: '%s'}) SET l.qtdEstoque = l.qtdEstoque - 1",
-                                livro.getIsbn()
-                        );
-                        tx.run(updateEstoqueQuery);
-                    }
-
-                    return null;
+                    tx.run(updateEstoqueQuery);
                 }
+
+                return null;
             });
 
             System.out.println("Venda registrada com sucesso!");

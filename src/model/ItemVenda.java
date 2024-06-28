@@ -91,7 +91,7 @@ public class ItemVenda {
         try (Session session = banco.getSession()) {
             // Query para buscar todas as vendas com seus livros e clientes
             String query = "MATCH (v:Venda)-[r:vendido]->(l:Livro), (v)-[:FEITA_POR]->(c:Cliente) " +
-                    "RETURN v, collect({livro: l, qtd: r.qtd}) AS livros, c";
+                    "RETURN v, collect({livro: l, qtd: r.qtd}) AS livros, c ORDER BY v.codigo";
             try(Transaction tx = session.beginTransaction()){
                 Result result = tx.run(query);
 
