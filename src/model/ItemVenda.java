@@ -74,21 +74,18 @@ public class ItemVenda {
     }
 
     public void printItemVendaSemFormatacao() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        String dataFormatada = sdf.format(venda.getDataVenda());
 
         System.out.println("Venda: " + codPedido);
         System.out.println("1 - Livros:        ");
         for (Livro livro: livros) {
-            System.out.print("    Código Livro: " + livro.getCodLivro());
-            System.out.print("    Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
-            System.out.print("    Quantidade: " + livro.getQtdEstoque());
+            System.out.println("    Código Livro: " + livro.getCodLivro());
+            System.out.println("    Livro: " + livro.getTitulo() + " ISBN: " + livro.getIsbn());
+            System.out.println("    Quantidade: " + livro.getQtdEstoque());
             System.out.println("-------------------------------------------");
         }
         System.out.println("2 - Metodo de Pagamento: " + venda.getMetodoPag());
-        System.out.println("3 - Data da Venda:       " + dataFormatada);
-        System.out.println("4 - Código Cliente:      " + cliente.getCodCliente());
-        System.out.println("    Cliente: " + cliente.getNome() + " " + cliente.getSobrenome());
+        System.out.println("3 - Data da Venda:       " + venda.getDataVenda());
+        System.out.println("4 - Cliente: " + cliente.getNome() + " " + cliente.getSobrenome());
         System.out.println("    CPF: " + cliente.getCpf());
     }
 
@@ -114,12 +111,14 @@ public class ItemVenda {
                     // Atribua outros campos de Venda conforme necessário
 
                     List<Livro> livros = new ArrayList<>();
+                    int codLivro = 1;
                     for (Object livroObject  : record.get("livros").asList()) {
                         Map<String, Object> livroMap = (Map<String, Object>) livroObject;
                         Node livroNode = (Node) livroMap.get("livro");
                         long quantidade = (long) livroMap.get("qtd");
 
                         Livro livro = new Livro();;
+                        livro.setCodLivro(codLivro);
                         livro.setTitulo(livroNode.get("titulo").asString());
                         livro.setGenero(livroNode.get("genero").asString());
                         livro.setAutor(livroNode.get("autor").asString());
@@ -129,6 +128,7 @@ public class ItemVenda {
                         livro.setQtdEstoque((int) quantidade);
 
                         livros.add(livro);
+                        codLivro++;
                     }
 
                     Cliente cliente = new Cliente();
@@ -156,7 +156,7 @@ public class ItemVenda {
 
         return itensVendas;
     }
-    public static void editarItemVenda(DataBaseConection banco, ItemVenda itemVenda, int remover) {
+    public static void editarItemVenda(DataBaseConection banco, ItemVenda itemVenda) {
         try {
             Session session = banco.getSession();
 
@@ -174,6 +174,7 @@ public class ItemVenda {
             System.out.println("Item de venda atualizado com sucesso!");
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Erro ao editar venda! " + e.getMessage());
         }
     }
 
@@ -204,12 +205,12 @@ public class ItemVenda {
 
                 System.out.println("Item de venda excluído com sucesso!");
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Não foi possivel excluir venda!");
             }
 
             session.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Não foi possivel excluir venda!");
         }
     }
 }

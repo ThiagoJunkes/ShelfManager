@@ -99,6 +99,17 @@ public class Livro {
         this.qtdEstoque = qtdEstoque;
     }
 
+    public void setLivro(Livro novoLivro) {
+        this.codLivro = novoLivro.getCodLivro();
+        this.titulo = novoLivro.getTitulo();
+        this.genero = novoLivro.getGenero();
+        this.autor = novoLivro.getAutor();
+        this.isbn = novoLivro.getIsbn();
+        this.anoPublicacao = novoLivro.getAnoPublicacao();
+        this.preco = novoLivro.getPreco();
+        this.codEditora = novoLivro.getCodEditora();
+        this.qtdEstoque = novoLivro.getQtdEstoque();
+    }
     public Livro() {
     }
 
@@ -121,6 +132,15 @@ public class Livro {
 
         System.out.printf("%-5d | %-20s | %-20s | %-20s | %-20s\n",
                 codLivro, tituloFormatado, genero, editoraFormatada, isbn);
+    }
+
+    public void printLivroFormatadoVenda(){
+        String tituloFormatado = titulo.length() > 20 ? titulo.substring(0, 20) : titulo;
+        String novoISBN = String.valueOf(isbn);
+        novoISBN = novoISBN.length() > 17 ? novoISBN.substring(0, 20) : novoISBN;
+
+        System.out.printf("%-5d | %-20s | %-17s | %d\n",
+                codLivro, tituloFormatado, isbn, qtdEstoque);
     }
 
     public void printEstoqueSemFormatacaoEstoque(){
