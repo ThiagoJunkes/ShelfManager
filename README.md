@@ -38,7 +38,7 @@ Obtenha a URL do Repositório:
 1. No IntelliJ IDEA, vá para File -> Project Structure.
 2. Na janela que abrir, selecione Modules no lado esquerdo.
 3. Na aba Dependencies, clique no + e selecione JARs or directories....
-4. Selecione o arquivo JAR do driver que está na pasta libs do seu projeto e clique em OK.
+4. Selecione o arquivo JAR 'neo4j-java-driver' e 'reactive-streams' que está na pasta libs do seu projeto e clique em OK.
 5. Clique em Apply e depois em OK.
 
 ## Eclipse
