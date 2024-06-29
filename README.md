@@ -18,11 +18,11 @@ Obtenha a URL do Repositório:
 
 ### Clone o Repositório:
 
-- Abra o IntelliJ IDEA.
-- Na tela de inicialização, escolha "Get from Version Control" ou vá para "File" -> "New" -> "Project from Version Control" -> "Git".
-- Na caixa de diálogo que aparecer, cole a URL que você copiou anteriormente.
-- Escolha o diretório onde deseja clonar o repositório localmente.
-- Clique em "Clone" para iniciar o processo de clonagem.
+1. Abra o IntelliJ IDEA.
+2. Na tela de inicialização, escolha "Get from Version Control" ou vá para "File" -> "New" -> "Project from Version Control" -> "Git".
+3. Na caixa de diálogo que aparecer, cole a URL que você copiou anteriormente.
+4. Escolha o diretório onde deseja clonar o repositório localmente.
+5. Clique em "Clone" para iniciar o processo de clonagem.
 
 ### Importe o Projeto para o IntelliJ IDEA:
 
@@ -35,29 +35,29 @@ Obtenha a URL do Repositório:
 
 ## IntelliJ IDEA
 
-- No IntelliJ IDEA, vá para File -> Project Structure.
-- Na janela que abrir, selecione Modules no lado esquerdo.
-- Na aba Dependencies, clique no + e selecione JARs or directories....
-- Selecione o arquivo JAR do driver que está na pasta libs do seu projeto e clique em OK.
-- Clique em Apply e depois em OK.
+1. No IntelliJ IDEA, vá para File -> Project Structure.
+2. Na janela que abrir, selecione Modules no lado esquerdo.
+3. Na aba Dependencies, clique no + e selecione JARs or directories....
+4. Selecione o arquivo JAR do driver que está na pasta libs do seu projeto e clique em OK.
+5. Clique em Apply e depois em OK.
 
 ## Eclipse
 
-- Clique com o botão direito no projeto no "Project Explorer".
-- Selecione Build Path -> Configure Build Path.
-- Na janela que abrir, vá para a aba Libraries.
-- Clique em Add JARs... ou Add External JARs... (se o JAR estiver fora do seu projeto).
-- Selecione o arquivo JAR do driver que está na pasta libs do seu projeto e clique em Open ou OK.
-- Clique em Apply and Close para aplicar as alterações.
+1. Clique com o botão direito no projeto no "Project Explorer".
+2. Selecione Build Path -> Configure Build Path.
+3. Na janela que abrir, vá para a aba Libraries.
+4. Clique em Add JARs... ou Add External JARs... (se o JAR estiver fora do seu projeto).
+5. Selecione o arquivo JAR do driver que está na pasta libs do seu projeto e clique em Open ou OK.
+6. Clique em Apply and Close para aplicar as alterações.
 
 ## NetBeans
 
-- Clique com o botão direito no seu projeto na janela Projects.
-- Selecione Properties.
-- Na janela que abrir, vá para Libraries.
-- Clique em Add JAR/Folder....
-- Selecione o arquivo JAR do driver que está na pasta libs do seu projeto e clique em Add JAR/Folder.
-- Clique em OK.
+1. Clique com o botão direito no seu projeto na janela Projects.
+2. Selecione Properties.
+3. Na janela que abrir, vá para Libraries.
+4. Clique em Add JAR/Folder....
+5. Selecione o arquivo JAR do driver que está na pasta libs do seu projeto e clique em Add JAR/Folder.
+6. Clique em OK.
 
 ## Testando a Conexão
 
