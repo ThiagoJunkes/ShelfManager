@@ -1,465 +1,81 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 16.2 (Ubuntu 16.2-1.pgdg22.04+1)
--- Dumped by pg_dump version 16.2 (Ubuntu 16.2-1.pgdg22.04+1)
-
--- Started on 2024-04-17 19:10:39 -03
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- TOC entry 3420 (class 1262 OID 16388)
--- Name: ShelfManager; Type: DATABASE; Schema: -; Owner: postgres
---
-
-CREATE DATABASE "ShelfManager" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.UTF-8';
-
-
-ALTER DATABASE "ShelfManager" OWNER TO postgres;
-
-\connect "ShelfManager"
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- TOC entry 222 (class 1259 OID 24663)
--- Name: clientes; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.clientes (
-    cod_cliente integer NOT NULL,
-    nome character varying(50) NOT NULL,
-    sobrenome character varying(250) NOT NULL,
-    cpf bigint NOT NULL,
-    email_cliente character varying(100),
-    telefone_cliente character varying(15),
-    data_cadastro date DEFAULT CURRENT_DATE,
-    cod_endereco integer
-);
-
-
-ALTER TABLE public.clientes OWNER TO postgres;
-
---
--- TOC entry 221 (class 1259 OID 24662)
--- Name: clientes_cod_cliente_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.clientes_cod_cliente_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.clientes_cod_cliente_seq OWNER TO postgres;
-
---
--- TOC entry 3421 (class 0 OID 0)
--- Dependencies: 221
--- Name: clientes_cod_cliente_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.clientes_cod_cliente_seq OWNED BY public.clientes.cod_cliente;
-
-
---
--- TOC entry 218 (class 1259 OID 24638)
--- Name: editoras; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.editoras (
-    cod_editora integer NOT NULL,
-    nome_editora character varying(250),
-    nome_contato character varying(250),
-    email_editora character varying(250),
-    telefone_editora character varying(15)
-);
-
-
-ALTER TABLE public.editoras OWNER TO postgres;
-
---
--- TOC entry 217 (class 1259 OID 24637)
--- Name: editoras_cod_editora_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.editoras_cod_editora_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.editoras_cod_editora_seq OWNER TO postgres;
-
---
--- TOC entry 3422 (class 0 OID 0)
--- Dependencies: 217
--- Name: editoras_cod_editora_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.editoras_cod_editora_seq OWNED BY public.editoras.cod_editora;
-
-
---
--- TOC entry 216 (class 1259 OID 24631)
--- Name: enderecos; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.enderecos (
-    cod_endereco integer NOT NULL,
-    rua character varying(100),
-    cidade character varying(100),
-    estado character varying(100),
-    cep integer,
-    complemento character varying(100)
-);
-
-
-ALTER TABLE public.enderecos OWNER TO postgres;
-
---
--- TOC entry 215 (class 1259 OID 24630)
--- Name: enderecos_cod_endereco_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.enderecos_cod_endereco_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.enderecos_cod_endereco_seq OWNER TO postgres;
-
---
--- TOC entry 3423 (class 0 OID 0)
--- Dependencies: 215
--- Name: enderecos_cod_endereco_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.enderecos_cod_endereco_seq OWNED BY public.enderecos.cod_endereco;
-
-
---
--- TOC entry 225 (class 1259 OID 24690)
--- Name: estoque; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.estoque (
-    cod_livro integer NOT NULL,
-    qtd_estoque integer
-);
-
-
-ALTER TABLE public.estoque OWNER TO postgres;
-
---
--- TOC entry 226 (class 1259 OID 24698)
--- Name: itens_vendas; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.itens_vendas (
-    cod_pedido integer NOT NULL,
-    cod_livro integer NOT NULL,
-    qtd_livros integer
-);
-
-
-ALTER TABLE public.itens_vendas OWNER TO postgres;
-
---
--- TOC entry 220 (class 1259 OID 24649)
--- Name: livros; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.livros (
-    cod_livro integer NOT NULL,
-    titulo character varying(250),
-    genero character varying(100),
-    autor character varying(250),
-    isbn bigint,
-    ano_publicacao date,
-    preco real,
-    cod_editora integer
-);
-
-
-ALTER TABLE public.livros OWNER TO postgres;
-
---
--- TOC entry 219 (class 1259 OID 24648)
--- Name: livros_cod_livro_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.livros_cod_livro_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.livros_cod_livro_seq OWNER TO postgres;
-
---
--- TOC entry 3424 (class 0 OID 0)
--- Dependencies: 219
--- Name: livros_cod_livro_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.livros_cod_livro_seq OWNED BY public.livros.cod_livro;
-
-
---
--- TOC entry 224 (class 1259 OID 24678)
--- Name: vendas; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.vendas (
-    cod_venda integer NOT NULL,
-    valor_venda real,
-    data_venda date DEFAULT CURRENT_DATE,
-    metodo_pag character varying(50),
-    cod_cliente integer
-);
-
-
-ALTER TABLE public.vendas OWNER TO postgres;
-
---
--- TOC entry 223 (class 1259 OID 24677)
--- Name: vendas_cod_venda_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.vendas_cod_venda_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.vendas_cod_venda_seq OWNER TO postgres;
-
---
--- TOC entry 3425 (class 0 OID 0)
--- Dependencies: 223
--- Name: vendas_cod_venda_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.vendas_cod_venda_seq OWNED BY public.vendas.cod_venda;
-
-
---
--- TOC entry 3245 (class 2604 OID 24666)
--- Name: clientes cod_cliente; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.clientes ALTER COLUMN cod_cliente SET DEFAULT nextval('public.clientes_cod_cliente_seq'::regclass);
-
-
---
--- TOC entry 3243 (class 2604 OID 24641)
--- Name: editoras cod_editora; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.editoras ALTER COLUMN cod_editora SET DEFAULT nextval('public.editoras_cod_editora_seq'::regclass);
-
-
---
--- TOC entry 3242 (class 2604 OID 24634)
--- Name: enderecos cod_endereco; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.enderecos ALTER COLUMN cod_endereco SET DEFAULT nextval('public.enderecos_cod_endereco_seq'::regclass);
-
-
---
--- TOC entry 3244 (class 2604 OID 24652)
--- Name: livros cod_livro; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.livros ALTER COLUMN cod_livro SET DEFAULT nextval('public.livros_cod_livro_seq'::regclass);
-
-
---
--- TOC entry 3247 (class 2604 OID 24681)
--- Name: vendas cod_venda; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.vendas ALTER COLUMN cod_venda SET DEFAULT nextval('public.vendas_cod_venda_seq'::regclass);
-
-
---
--- TOC entry 3258 (class 2606 OID 24671)
--- Name: clientes clientes_email_cliente_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.clientes
-    ADD CONSTRAINT clientes_email_cliente_key UNIQUE (email_cliente);
-
-
---
--- TOC entry 3260 (class 2606 OID 24669)
--- Name: clientes clientes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.clientes
-    ADD CONSTRAINT clientes_pkey PRIMARY KEY (cod_cliente);
-
-
---
--- TOC entry 3252 (class 2606 OID 24647)
--- Name: editoras editoras_email_editora_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.editoras
-    ADD CONSTRAINT editoras_email_editora_key UNIQUE (email_editora);
-
-
---
--- TOC entry 3254 (class 2606 OID 24645)
--- Name: editoras editoras_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.editoras
-    ADD CONSTRAINT editoras_pkey PRIMARY KEY (cod_editora);
-
-
---
--- TOC entry 3250 (class 2606 OID 24636)
--- Name: enderecos enderecos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.enderecos
-    ADD CONSTRAINT enderecos_pkey PRIMARY KEY (cod_endereco);
-
-
---
--- TOC entry 3264 (class 2606 OID 24702)
--- Name: itens_vendas itens_vendas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.itens_vendas
-    ADD CONSTRAINT itens_vendas_pkey PRIMARY KEY (cod_pedido, cod_livro);
-
-
---
--- TOC entry 3256 (class 2606 OID 24656)
--- Name: livros livros_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.livros
-    ADD CONSTRAINT livros_pkey PRIMARY KEY (cod_livro);
-
-
---
--- TOC entry 3262 (class 2606 OID 24684)
--- Name: vendas vendas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.vendas
-    ADD CONSTRAINT vendas_pkey PRIMARY KEY (cod_venda);
-
-
---
--- TOC entry 3271 (class 2620 OID 24714)
--- Name: itens_vendas atualizar_estoque_trigger; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-CREATE TRIGGER atualizar_estoque_trigger AFTER INSERT ON public.itens_vendas FOR EACH ROW EXECUTE FUNCTION public.atualizar_estoque();
-
-
---
--- TOC entry 3266 (class 2606 OID 24672)
--- Name: clientes clientes_cod_endereco_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.clientes
-    ADD CONSTRAINT clientes_cod_endereco_fkey FOREIGN KEY (cod_endereco) REFERENCES public.enderecos(cod_endereco);
-
-
---
--- TOC entry 3268 (class 2606 OID 24693)
--- Name: estoque estoque_cod_livro_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.estoque
-    ADD CONSTRAINT estoque_cod_livro_fkey FOREIGN KEY (cod_livro) REFERENCES public.livros(cod_livro);
-
-
---
--- TOC entry 3269 (class 2606 OID 24708)
--- Name: itens_vendas itens_vendas_cod_livro_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.itens_vendas
-    ADD CONSTRAINT itens_vendas_cod_livro_fkey FOREIGN KEY (cod_livro) REFERENCES public.livros(cod_livro);
-
-
---
--- TOC entry 3270 (class 2606 OID 24703)
--- Name: itens_vendas itens_vendas_cod_pedido_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.itens_vendas
-    ADD CONSTRAINT itens_vendas_cod_pedido_fkey FOREIGN KEY (cod_pedido) REFERENCES public.vendas(cod_venda);
-
-
---
--- TOC entry 3265 (class 2606 OID 24657)
--- Name: livros livros_cod_editora_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.livros
-    ADD CONSTRAINT livros_cod_editora_fkey FOREIGN KEY (cod_editora) REFERENCES public.editoras(cod_editora);
-
-
---
--- TOC entry 3267 (class 2606 OID 24685)
--- Name: vendas vendas_cod_cliente_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.vendas
-    ADD CONSTRAINT vendas_cod_cliente_fkey FOREIGN KEY (cod_cliente) REFERENCES public.clientes(cod_cliente);
-
-
--- Completed on 2024-04-17 19:10:40 -03
-
---
--- PostgreSQL database dump complete
---
+// Create Editoras
+CREATE (:Editora {nome: 'Editora Estelar', nome_contato: 'Marcos Oliveira', email: 'contato@editoraestelar.com', telefone: '(11) 98765-4321'});
+CREATE (:Editora {nome: 'Mundo dos Livros', nome_contato: 'Amanda Santos', email: 'contato@mundodoslivros.com', telefone: '(22) 12345-6789'});
+CREATE (:Editora {nome: 'Páginas Encantadas', nome_contato: 'Rafaela Lima', email: 'contato@paginasencantadas.com', telefone: '(33) 87654-3210'});
+CREATE (:Editora {nome: 'Terra Mágica', nome_contato: 'Felipe Almeida', email: 'contato@terramagica.com', telefone: '(44) 23456-7890'});
+
+// Create Livros
+CREATE (:Livro {titulo: 'Aventuras em Marte', genero: 'Ficção Científica', autor: 'João Silva', isbn: 9781234567890, ano_publicacao: '15/05/2022', preco: 29.99, quantidade_estoque: 12});
+CREATE (:Livro {titulo: 'O Segredo do Abismo', genero: 'Suspense', autor: 'Maria Santos', isbn: 9782345678901, ano_publicacao: '20/10/2020', preco: 24.99, quantidade_estoque: 12});
+CREATE (:Livro {titulo: 'Caminho das Estrelas', genero: 'Fantasia', autor: 'Carlos Oliveira', isbn: 9783456789012, ano_publicacao: '12/03/2019', preco: 19.99, quantidade_estoque: 12});
+CREATE (:Livro {titulo: 'A Arte da Guerra', genero: 'Não Ficção', autor: 'Ana Souza', isbn: 9784567890123, ano_publicacao: '01/07/2015', preco: 14.99, quantidade_estoque: 12});
+CREATE (:Livro {titulo: 'Histórias do Além', genero: 'Horror', autor: 'Pedro Alves', isbn: 9785678901234, ano_publicacao: '05/12/2021', preco: 34.99, quantidade_estoque: 12});
+
+// Create Endereços
+CREATE (:Endereco {cpf_morador: '12345678901', rua: 'Rua das Flores', cidade: 'Cidade A', estado: 'SC', cep: 89217230, complemento: 'Apto 101'});
+CREATE (:Endereco {cpf_morador: '23456789012', rua: 'Avenida Central', cidade: 'Cidade B', estado: 'SC', cep: 89217230, complemento: 'Casa 20'});
+CREATE (:Endereco {cpf_morador: '34567890123', rua: 'Rua Principal', cidade: 'Cidade C', estado: 'SP', cep: 89217230, complemento: 'Bloco B'});
+CREATE (:Endereco {cpf_morador: '45678901234', rua: 'Travessa das Palmeiras', cidade: 'Cidade D', estado: 'SP', cep: 89217230, complemento: 'Sala 05'});
+CREATE (:Endereco {cpf_morador: '56789012345', rua: 'Alameda dos Ipês', cidade: 'Cidade E', estado: 'RJ', cep: 89217230, complemento: 'Casa 15'});
+CREATE (:Endereco {cpf_morador: '67890123456', rua: 'Avenida das Águias', cidade: 'Cidade F', estado: 'RJ', cep: 89217230, complemento: 'Apartamento 301'});
+CREATE (:Endereco {cpf_morador: '78901234567', rua: 'Praça da Liberdade', cidade: 'Cidade G', estado: 'RG', cep: 89217230, complemento: 'Bloco C, 2º Andar'});
+CREATE (:Endereco {cpf_morador: '89012345678', rua: 'Rua dos Girassóis', cidade: 'Cidade H', estado: 'RG', cep: 89217230, complemento: 'Casa 30'});
+CREATE (:Endereco {cpf_morador: '90123456789', rua: 'Avenida dos Pinheiros', cidade: 'Cidade I', estado: 'BA', cep: 89217230, complemento: 'Loja 02'});
+CREATE (:Endereco {cpf_morador: '12345678910', rua: 'Rodovia do Sol', cidade: 'Cidade J', estado: 'AM', cep: 89217230, complemento: 'Galpão 10'});
+
+// Create Clientes
+CREATE (:Cliente {nome: 'Ana', sobrenome: 'Silva', cpf: '12345678901', email: 'ana.silva@email.com', telefone: '(11) 98765-4321', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'Pedro', sobrenome: 'Oliveira', cpf: '23456789012', email: 'pedro.oliveira@email.com', telefone: '(22) 12345-6789', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'Carla', sobrenome: 'Santos', cpf: '34567890123', email: 'carla.santos@email.com', telefone: '(33) 87654-3210', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'João', sobrenome: 'Souza', cpf: '45678901234', email: 'joao.souza@email.com', telefone: '(44) 23456-7890', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'Marcos', sobrenome: 'Lima', cpf: '56789012345', email: 'marcos.lima@email.com', telefone: '(55) 34567-8901', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'Fernanda', sobrenome: 'Carvalho', cpf: '67890123456', email: 'fernanda.carvalho@email.com', telefone: '(66) 45678-9012', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'Lucas', sobrenome: 'Mendes', cpf: '78901234567', email: 'lucas.mendes@email.com', telefone: '(77) 56789-0123', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'Juliana', sobrenome: 'Alves', cpf: '89012345678', email: 'juliana.alves@email.com', telefone: '(88) 67890-1234', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'Ricardo', sobrenome: 'Pereira', cpf: '90123456789', email: 'ricardo.pereira@email.com', telefone: '(99) 78901-2345', data_cadastro: '09/06/2024'});
+CREATE (:Cliente {nome: 'Camila', sobrenome: 'Ferreira', cpf: '12345678910', email: 'camila.ferreira@email.com', telefone: '(11) 89012-3456', data_cadastro: '09/06/2024'});
+
+// Create Vendas and relationships with Clientes
+CREATE (:Venda {codigo: 1, valor: 54.98, data: '09/06/2024', metodo_pag: 'Cartão de Crédito'});
+CREATE (:Venda {codigo: 2, valor: 34.98, data: '09/06/2024', metodo_pag: 'Boleto Bancário'});
+CREATE (:Venda {codigo: 3, valor: 64.98, data: '09/06/2024', metodo_pag: 'Boleto Bancário'});
+CREATE (:Venda {codigo: 4, valor: 39.98, data: '09/06/2024', metodo_pag: 'Pix'});
+CREATE (:Venda {codigo: 5, valor: 69.97, data: '09/06/2024', metodo_pag: 'Dinheiro'});
+
+// Match Vendas with Clientes and create relationships
+MATCH (c1:Cliente {cpf: '12345678901'}), (v1:Venda {codigo: 1}) CREATE (v1)-[:FEITA_POR]->(c1);
+MATCH (c2:Cliente {cpf: '23456789012'}), (v2:Venda {codigo: 2}) CREATE (v2)-[:FEITA_POR]->(c2);
+MATCH (c3:Cliente {cpf: '34567890123'}), (v3:Venda {codigo: 3}) CREATE (v3)-[:FEITA_POR]->(c3);
+MATCH (c4:Cliente {cpf: '45678901234'}), (v4:Venda {codigo: 4}) CREATE (v4)-[:FEITA_POR]->(c4);
+MATCH (c5:Cliente {cpf: '56789012345'}), (v5:Venda {codigo: 5}) CREATE (v5)-[:FEITA_POR]->(c5);
+
+// Create relationships between Vendas e Livros
+MATCH (v1:Venda {codigo: 1}), (l1:Livro {isbn: 9781234567890}) CREATE (v1)-[:vendido {qtd: 1}]->(l1);
+MATCH (v1:Venda {codigo: 1}), (l2:Livro {isbn: 9782345678901}) CREATE (v1)-[:vendido {qtd: 1}]->(l2);
+MATCH (v2:Venda {codigo: 2}), (l3:Livro {isbn: 9783456789012}) CREATE (v2)-[:vendido {qtd: 2}]->(l3);
+MATCH (v2:Venda {codigo: 2}), (l4:Livro {isbn: 9784567890123}) CREATE (v2)-[:vendido {qtd: 1}]->(l4);
+MATCH (v3:Venda {codigo: 3}), (l5:Livro {isbn: 9785678901234}) CREATE (v3)-[:vendido {qtd: 1}]->(l5);
+MATCH (v3:Venda {codigo: 3}), (l1:Livro {isbn: 9781234567890}) CREATE (v3)-[:vendido {qtd: 2}]->(l1);
+MATCH (v4:Venda {codigo: 4}), (l2:Livro {isbn: 9782345678901}) CREATE (v4)-[:vendido {qtd: 1}]->(l2);
+MATCH (v4:Venda {codigo: 4}), (l3:Livro {isbn: 9783456789012}) CREATE (v4)-[:vendido {qtd: 3}]->(l3);
+MATCH (v5:Venda {codigo: 5}), (l4:Livro {isbn: 9784567890123}) CREATE (v5)-[:vendido {qtd: 1}]->(l4);
+MATCH (v5:Venda {codigo: 5}), (l5:Livro {isbn: 9785678901234}) CREATE (v5)-[:vendido {qtd: 2}]->(l5);
+
+// Create relationships between Editoras e Livros
+MATCH (l:Livro {isbn: 9781234567890}), (e:Editora {nome: 'Editora Estelar'}) CREATE (l)-[:publicado_por]->(e);
+MATCH (l:Livro {isbn: 9782345678901}), (e:Editora {nome: 'Mundo dos Livros'}) CREATE (l)-[:publicado_por]->(e);
+MATCH (l:Livro {isbn: 9783456789012}), (e:Editora {nome: 'Páginas Encantadas'}) CREATE (l)-[:publicado_por]->(e);
+MATCH (l:Livro {isbn: 9784567890123}), (e:Editora {nome: 'Terra Mágica'}) CREATE (l)-[:publicado_por]->(e);
+MATCH (l:Livro {isbn: 9785678901234}), (e:Editora {nome: 'Editora Estelar'}) CREATE (l)-[:publicado_por]->(e);
+
+// Create relationships between Clientes e Endereços
+MATCH (c1:Cliente {cpf: '12345678901'}), (e1:Endereco {cpf_morador: '12345678901'}) CREATE (c1)-[:mora_em]->(e1);
+MATCH (c2:Cliente {cpf: '23456789012'}), (e2:Endereco {cpf_morador: '23456789012'}) CREATE (c2)-[:mora_em]->(e2);
+MATCH (c3:Cliente {cpf: '34567890123'}), (e3:Endereco {cpf_morador: '34567890123'}) CREATE (c3)-[:mora_em]->(e3);
+MATCH (c4:Cliente {cpf: '45678901234'}), (e4:Endereco {cpf_morador: '45678901234'}) CREATE (c4)-[:mora_em]->(e4);
+MATCH (c5:Cliente {cpf: '56789012345'}), (e5:Endereco {cpf_morador: '56789012345'}) CREATE (c5)-[:mora_em]->(e5);
+MATCH (c6:Cliente {cpf: '67890123456'}), (e6:Endereco {cpf_morador: '67890123456'}) CREATE (c6)-[:mora_em]->(e6);
+MATCH (c7:Cliente {cpf: '78901234567'}), (e7:Endereco {cpf_morador: '78901234567'}) CREATE (c7)-[:mora_em]->(e7);
+MATCH (c8:Cliente {cpf: '89012345678'}), (e8:Endereco {cpf_morador: '89012345678'}) CREATE (c8)-[:mora_em]->(e8);
+MATCH (c9:Cliente {cpf: '90123456789'}), (e9:Endereco {cpf_morador: '90123456789'}) CREATE (c9)-[:mora_em]->(e9);
+MATCH (c10:Cliente {cpf: '12345678910'}), (e10:Endereco {cpf_morador: '12345678910'}) CREATE (c10)-[:mora_em]->(e10);
