@@ -94,10 +94,10 @@ public class ItemVenda {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         try (Session session = banco.getSession()) {
-            // Query para buscar todas as vendas com seus livros e clientes
-            String query = "MATCH (v:Venda)-[r:vendido]->(l:Livro), (v)-[:FEITA_POR]->(c:Cliente) " +
-                    "RETURN v, collect({livro: l, qtd: r.qtd}) AS livros, c ORDER BY v.codigo";
-            try(Transaction tx = session.beginTransaction()){
+            Transaction tx = session.beginTransaction();
+                // Query para buscar todas as vendas com seus livros e clientes
+                String query = "MATCH (v:Venda)-[r:vendido]->(l:Livro), (v)-[:FEITA_POR]->(c:Cliente) " +
+                        "RETURN v, collect({livro: l, qtd: r.qtd}) AS livros, c ORDER BY v.codigo";
                 Result result = tx.run(query);
 
                 while (result.hasNext()) {
@@ -149,7 +149,7 @@ public class ItemVenda {
 
                     itensVendas.add(itemVenda);
                 }
-            }
+
         } catch (Exception e) {
             System.out.println("Falha ao buscar Vendas!");
         }
@@ -157,26 +157,51 @@ public class ItemVenda {
         return itensVendas;
     }
     public static void editarItemVenda(DataBaseConection banco, ItemVenda itemVenda) {
-        try {
-            Session session = banco.getSession();
+        try (Session session = banco.getSession()) {
+            // Remove relações de Venda e Livros
+            String removeBooksQuery = "MATCH (v:Venda {codigo: " + itemVenda.venda.getCodVenda() + "})-[r:vendido]->(l:Livro) " +
+                    "DELETE r";
+            session.run(removeBooksQuery);
 
-            // Atualizar dados do item de venda
-            String query = "MATCH (v:Venda)-[r:CONTEM]->(l:Livro) " +
-                    "WHERE ID(v) = $codPedido AND ID(l) = $codLivro " +
-                    "SET r.qtdLivros = $qtdLivros";
-            session.run(query, Values.parameters(
-                    "codPedido", itemVenda.getVenda().getCodVenda(),
-                    //"codLivro", itemVenda.getLivro().getCodLivro(),
-                    "qtdLivros", itemVenda.getQtdLivros()
-            ));
+            // Remove relação Venda e Cliente
+            String removeCustomerQuery = "MATCH (v:Venda {codigo: " + itemVenda.venda.getCodVenda() + "})-[r:FEITA_POR]->(c:Cliente) " +
+                    "DELETE r";
+            session.run(removeCustomerQuery);
+
+            double novoValor = 0;
+            for (Livro livro : itemVenda.livros) {
+                novoValor += (livro.getQtdEstoque() * livro.getPreco());
+            }
+
+            // Update Venda
+            String updateSaleQuery = "MATCH (v:Venda {codigo: " + itemVenda.venda.getCodVenda() + "}) " +
+                    "SET v.valor = " + novoValor +
+                    ", v.data = '" + itemVenda.venda.getDataVenda() +
+                    "', v.metodo_pag = '" + itemVenda.venda.getMetodoPag() + "'";
+            session.run(updateSaleQuery);
+
+            // Create relationship with updated customer
+            String createCustomerRelQuery = "MATCH (v:Venda {codigo: " + itemVenda.venda.getCodVenda() +
+                    "}), (c:Cliente {cpf: '" + itemVenda.cliente.getCpf() + "'}) " +
+                    "CREATE (v)-[:FEITA_POR]->(c)";
+            session.run(createCustomerRelQuery);
+
+            // Create relationships with updated books
+            for (Livro livro : itemVenda.livros) {
+                String createBookRelQuery = "MATCH (v:Venda {codigo: " + itemVenda.venda.getCodVenda() +
+                        "}), (l:Livro {isbn: " + livro.getIsbn() + "}) " +
+                        "CREATE (v)-[:vendido {qtd: " + livro.getQtdEstoque() + "}]->(l)";
+                session.run(createBookRelQuery);
+            }
 
             session.close();
             System.out.println("Item de venda atualizado com sucesso!");
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Erro ao editar venda! " + e.getMessage());
         }
     }
+
+
 
     public static void excluirItemVenda(DataBaseConection banco, ItemVenda itemVenda) {
         try {
