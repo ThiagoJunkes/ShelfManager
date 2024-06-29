@@ -707,8 +707,8 @@ public class Main {
 
         List<Livro> estoques = Livro.buscarLivros(banco);
         Menu.estoque(estoques);
-        System.out.println("* Ao adicionar um Livro ele automaticamente aparece em estoque.");
-        System.out.println("* Não é possivel excluir diretamente no estoque.");
+        System.out.println("* Ao adicionar um livro este automaticamente aparece em estoque.");
+        System.out.println("* Não é possivel excluir diretamente do estoque.");
         System.out.println("* Acesse o Menu de Livros e exclua um Livro para o seu estoque ser excluido.");
         System.out.println(" 0 - Menu Inicial | 1 - Editar Estoque ");
         System.out.print("Escolha uma opção: ");

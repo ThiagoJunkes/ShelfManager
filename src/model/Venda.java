@@ -106,7 +106,7 @@ public class Venda {
 
                     // Atualizar a quantidade no estoque
                     String updateEstoqueQuery = String.format(
-                            "MATCH (l:Livro {isbn: %s}) SET l.qtdEstoque = l.qtdEstoque - %d",
+                            "MATCH (l:Livro {isbn: %s}) SET l.quantidade_estoque = l.quantidade_estoque - %d",
                             livro.getIsbn(), livro.getQtdEstoque()
                     );
                     tx.run(updateEstoqueQuery);
