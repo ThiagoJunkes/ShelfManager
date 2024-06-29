@@ -177,22 +177,12 @@ public class Main {
                                     System.out.print("Digite o sobrenome: ");
                                     String sobrenome = scanner.nextLine();
                                     if (sobrenome.length() <= 250 && !sobrenome.equals("")){
-                                        editar.setNome(sobrenome);
+                                        editar.setSobrenome(sobrenome);
                                     }else{
                                         System.out.println("Ultrapassou o limite de caracteres!");
                                     }
                                     break;
                                 case 3:
-                                    System.out.print("Digite o novo CPF: ");
-                                    long cpf = Long.parseLong(scanner.nextLine());
-                                    if (String.valueOf(cpf).length() == 11) {
-                                        editar.setCpf(cpf);
-                                    } else {
-                                        System.out.println("CPF inválido! Deve conter 11 dígitos.");
-                                        cadastrar = false;
-                                    }
-                                    break;
-                                case 4:
                                     System.out.print("Digite o novo email: ");
                                     String email = scanner.nextLine();
                                     if(email.contains("@") && email.length() < 100){
@@ -202,7 +192,7 @@ public class Main {
                                         cadastrar = false;
                                     }
                                     break;
-                                case 5:
+                                case 4:
                                     System.out.print("Digite o novo telefone '(XX) XXXX-XXXX': ");
                                     String telefone = scanner.nextLine();
                                     if (telefone.matches("\\(\\d{2}\\)\\s\\d{4,5}-\\d{4}")) {
@@ -212,7 +202,7 @@ public class Main {
                                         cadastrar = false;
                                     }
                                     break;
-                                case 6:
+                                case 5:
                                     System.out.print("Digite a rua: ");
                                     String rua = scanner.nextLine();
                                     if (rua.length() <= 50 && !rua.equals("")){
@@ -222,7 +212,7 @@ public class Main {
                                         cadastrar = false;
                                     }
                                     break;
-                                case 7:
+                                case 6:
                                     System.out.print("Digite a nova cidade: ");
                                     String cidade = scanner.nextLine();
                                     if (cidade.length() <= 100 && !cidade.equals("")) {
@@ -232,7 +222,7 @@ public class Main {
                                         cadastrar = false;
                                     }
                                     break;
-                                case 8:
+                                case 7:
                                     System.out.print("Digite o novo estado: ");
                                     String estado = scanner.nextLine();
                                     if (estado.length() == 2 && estado.matches("[A-Za-z]{2}")) {
@@ -242,7 +232,7 @@ public class Main {
                                         cadastrar = false;
                                     }
                                     break;
-                                case 9:
+                                case 8:
                                     System.out.print("Digite o novo CEP: ");
                                     int cep = Integer.parseInt(scanner.nextLine());
                                     if (String.valueOf(cep).length() == 8) {
@@ -252,7 +242,7 @@ public class Main {
                                         cadastrar = false;
                                     }
                                     break;
-                                case 10:
+                                case 9:
                                     System.out.print("Digite o novo complemento: ");
                                     String complemento = scanner.nextLine();
                                     if (complemento.length() <= 100) {
@@ -267,12 +257,11 @@ public class Main {
                                     cadastrar = false;
                             }
                             if(cadastrar){
-                                if(escolhaEditar > 5 && escolhaEditar <= 10){
-                                    Endereco.editarEndereco(editar.endereco, banco);
+                                if(escolhaEditar > 5 && escolhaEditar <= 9){
+                                    Endereco.editarEndereco(editar, banco);
                                 } else if (escolhaEditar > 0){
                                     Cliente.editarCliente(editar, banco);
                                 }
-
                             }
                         } catch (Exception e) {
                             System.out.println("Opção Inválida!");

@@ -12,7 +12,8 @@
     <list default="true" id="32c97c09-6cb3-43fc-9e7f-b8d0fe87f2a9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller/Relatorio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/Relatorio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Cliente.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Cliente.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Endereco.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Endereco.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,6 +127,8 @@
       <workItem from="1719533124479" duration="2160000" />
       <workItem from="1719613199843" duration="11074000" />
       <workItem from="1719681343978" duration="1995000" />
+      <workItem from="1719683420896" duration="59000" />
+      <workItem from="1719687037534" duration="3108000" />
     </task>
     <servers />
   </component>
@@ -133,6 +136,20 @@
     <option name="version" value="3" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/model/Cliente.java</url>
+          <line>131</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/model/Endereco.java</url>
+          <line>81</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="query" />

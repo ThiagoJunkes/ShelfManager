@@ -104,26 +104,25 @@ public class Cliente {
         );
     }
     public void printClienteSemFormatacao() {
-        System.out.println("Cliente: " + codCliente + " | Data Cadastro: " + dataCadastro);
+        System.out.println("CPF: " + cpf + " | Data Cadastro: " + dataCadastro);
         System.out.println("1 - Nome:          " + nome);
         System.out.println("2 - Sobrenome:     " + sobrenome);
-        System.out.println("3 - CPF:           " + cpf);
-        System.out.println("4 - Email:         " + emailCliente);
-        System.out.println("5 - Telefone:      " + telefoneCliente);
+        System.out.println("3 - Email:         " + emailCliente);
+        System.out.println("4 - Telefone:      " + telefoneCliente);
 
         if (endereco != null) {
             System.out.println("Endereço:");
-            System.out.println("6 - Rua:           " + endereco.getRua());
-            System.out.println("7 - Cidade:        " + endereco.getCidade());
-            System.out.println("8 - Estado:        " + endereco.getEstado());
-            System.out.println("9 - CEP:           " + endereco.getCep());
-            System.out.println("10- Complemento:   " + endereco.getComplemento());
+            System.out.println("5 - Rua:           " + endereco.getRua());
+            System.out.println("6 - Cidade:        " + endereco.getCidade());
+            System.out.println("7 - Estado:        " + endereco.getEstado());
+            System.out.println("8 - CEP:           " + endereco.getCep());
+            System.out.println("9- Complemento:   " + endereco.getComplemento());
         }
     }
 
     public static boolean editarCliente(Cliente clienteAtualizado, DataBaseConection banco) {
         try (Session session = banco.getSession()) {
-            String query = "MATCH (cliente:Cliente {cpf: " + clienteAtualizado.getCpf() + "}) " +
+            String query = "MATCH (cliente:Cliente {cpf: '" + clienteAtualizado.getCpf() + "'}) " +
                     "SET cliente.nome = '" + clienteAtualizado.getNome() + "', " +
                     "    cliente.sobrenome = '" + clienteAtualizado.getSobrenome() + "', " +
                     "    cliente.email_cliente = '" + clienteAtualizado.getEmailCliente() + "', " +

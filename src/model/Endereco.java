@@ -67,16 +67,16 @@ public class Endereco {
         this.complemento = complemento;
     }
 
-    public static boolean editarEndereco(Endereco endereco, DataBaseConection banco) {
+    public static boolean editarEndereco(Cliente cliente, DataBaseConection banco) {
         boolean sucesso = false;
 
         try (Session session = banco.getSession()) {
-            String query = "MATCH (e:Endereco {cpf_morador: " + endereco.getCodEndereco() + "}) " +
-                    "SET e.rua = '" + endereco.getRua() + "', " +
-                    "    e.cidade = '" + endereco.getCidade() + "', " +
-                    "    e.estado = '" + endereco.getEstado() + "', " +
-                    "    e.cep = " + endereco.getCep() + ", " +
-                    "    e.complemento = '" + endereco.getComplemento() + "' " +
+            String query = "MATCH (e:Endereco {cpf_morador: '" + cliente.getCpf() + "'}) " +
+                    "SET e.rua = '" + cliente.endereco.getRua() + "', " +
+                    "    e.cidade = '" + cliente.endereco.getCidade() + "', " +
+                    "    e.estado = '" + cliente.endereco.getEstado() + "', " +
+                    "    e.cep = " + cliente.endereco.getCep() + ", " +
+                    "    e.complemento = '" + cliente.endereco.getComplemento() + "' " +
                     "RETURN e";
 
             List<Record> result = session.writeTransaction(tx -> {
@@ -96,57 +96,6 @@ public class Endereco {
 
         return sucesso;
     }
-
-    public static void excluirEndereco(Endereco endereco, DataBaseConection banco) {
-        try (Session session = banco.getSession()) {
-            String query = "MATCH (e:Endereco {cod_endereco: " + endereco.getCodEndereco() + "}) " +
-                    "DETACH DELETE e";
-
-            session.writeTransaction(tx -> {
-                tx.run(query);
-                return null;
-            });
-
-            System.out.println("Endereço excluído com sucesso!");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Falha ao excluir endereço.");
-        }
-    }
-
-    public static List<Endereco> buscarEnderecos(DataBaseConection banco) {
-        List<Endereco> enderecos = new ArrayList<>();
-
-        try (Session session = banco.getSession()) {
-            String query = "MATCH (e:Endereco) RETURN e";
-
-            List<Record> result = session.readTransaction(tx -> {
-                Result resultSet = tx.run(query);
-                return resultSet.list();
-            });
-
-            for (Record record : result) {
-                Node enderecoNode = record.get("e").asNode();
-                Endereco endereco = new Endereco();
-
-                endereco.setCodEndereco(enderecoNode.get("cod_endereco").asInt());
-                endereco.setRua(enderecoNode.get("rua").asString());
-                endereco.setCidade(enderecoNode.get("cidade").asString());
-                endereco.setEstado(enderecoNode.get("estado").asString());
-                endereco.setCep(enderecoNode.get("cep").asInt());
-                endereco.setComplemento(enderecoNode.get("complemento").asString());
-
-                enderecos.add(endereco);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Falha ao buscar endereços.");
-        }
-
-        return enderecos;
-    }
-
 
 }
 
