@@ -74,7 +74,7 @@ Obtenha a URL do Repositório:
 Agora abra o prompt de comando e rode o seguinte codigo:
 
    ```
-java-cp"C:\L`cal\Arquivo\ShelfManager\out\artifacts\ShelfManager_jar\ShelfManager.jar" Main
+java-cp"C:\Local\Arquivo\ShelfManager\out\artifacts\ShelfManager_jar\ShelfManager.jar" Main
    ```
 
 Alterando C:\Local\Arquivo para o local onde o projeto está localizado.
