@@ -12,6 +12,7 @@
     <list default="true" id="32c97c09-6cb3-43fc-9e7f-b8d0fe87f2a9" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Estoque.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Estoque.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/model/Venda.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Venda.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -127,7 +128,7 @@
       <workItem from="1719613199843" duration="11074000" />
       <workItem from="1719681343978" duration="1995000" />
       <workItem from="1719683420896" duration="59000" />
-      <workItem from="1719687037534" duration="3847000" />
+      <workItem from="1719687037534" duration="4105000" />
     </task>
     <servers />
   </component>

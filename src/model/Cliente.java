@@ -125,8 +125,8 @@ public class Cliente {
             String query = "MATCH (cliente:Cliente {cpf: '" + clienteAtualizado.getCpf() + "'}) " +
                     "SET cliente.nome = '" + clienteAtualizado.getNome() + "', " +
                     "    cliente.sobrenome = '" + clienteAtualizado.getSobrenome() + "', " +
-                    "    cliente.email_cliente = '" + clienteAtualizado.getEmailCliente() + "', " +
-                    "    cliente.telefone_cliente = '" + clienteAtualizado.getTelefoneCliente() + "' " +
+                    "    cliente.email = '" + clienteAtualizado.getEmailCliente() + "', " +
+                    "    cliente.telefone = '" + clienteAtualizado.getTelefoneCliente() + "' " +
                     "RETURN cliente";
 
             List<Record> result = session.writeTransaction(tx -> {
