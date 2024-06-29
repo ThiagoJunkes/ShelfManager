@@ -1,6 +1,6 @@
 # ShelfManager
 ### Trabalho para a disciplina de Banco de Dados 2 do curso de Análise e Desenvolvimento de Sistemas da UDESC.
-#### Desenvolvido em Java 22, utilizando PostgreSQL.
+#### Desenvolvido em Java 22, utilizando Neo4j.
 ## Recursos utilizados para o desenvolvimento do projeto
 - Neo4j Desktop (versão 5.21.0);
 - IDE IntelliJ IDEA Community.
