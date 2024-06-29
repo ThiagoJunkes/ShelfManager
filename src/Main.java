@@ -7,7 +7,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-//import controller.Relatorio;
+import controller.Relatorio;
 
 public class Main {
 
@@ -45,7 +45,7 @@ public class Main {
                     break;
                 case "6":
                     System.out.println("Opção Relatórios selecionada.");
-                    //Relatorio.main(new String[0]);
+                    Relatorio.main(new String[0]);
                     break;
                 case "0":
                     System.out.println("Saindo...");
