@@ -5,7 +5,7 @@
 - Neo4j Desktop (versão 5.21.0);
 - IDE IntelliJ IDEA Community.
 
-## Criando o Banco de Dados no PostgreSQL
+## Criando o Banco de Dados no Neo4j
 Para criar o banco de dados "ShelfManager" no Neo4j, siga os passos abaixo:
 1. Abra o Neo4j Desktop, clique em New na aba Projects e em Create New Project.
 2. Edite o nome de seu projeto e clique em Add - Local DBMS.
